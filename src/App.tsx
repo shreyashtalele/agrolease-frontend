@@ -1,10 +1,15 @@
+import { useState } from "react";
 import { Button } from "@/components/common/Button";
 import { Input } from "@/components/common/Input";
 import { Card } from "@/components/common/Card";
 import { Badge } from "@/components/common/Badge";
 import { Avatar } from "@/components/common/Avatar";
+import { Modal } from "@/components/common/Modal";
 
 function App() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-neutral-50 p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
@@ -12,64 +17,22 @@ function App() {
           🌾 AgroLease - Component Library
         </h1>
 
-        {/* Badge Section */}
+        {/* Modal Section */}
         <Card className="mb-6">
           <Card.Header>
             <h3 className="text-lg font-semibold text-neutral-800">
-              Badge Component
+              Modal Component
             </h3>
           </Card.Header>
           <Card.Body>
             <div className="flex flex-wrap gap-3">
-              <Badge>Default</Badge>
-              <Badge variant="primary">Primary</Badge>
-              <Badge variant="success">Success</Badge>
-              <Badge variant="warning">Warning</Badge>
-              <Badge variant="error">Error</Badge>
-              <Badge variant="info">Info</Badge>
-            </div>
-            <div className="flex flex-wrap gap-3 mt-4">
-              <Badge withDot>Default</Badge>
-              <Badge variant="primary" withDot>
-                Primary
-              </Badge>
-              <Badge variant="success" withDot>
-                Success
-              </Badge>
-              <Badge variant="warning" withDot>
-                Warning
-              </Badge>
-              <Badge variant="error" withDot>
-                Error
-              </Badge>
-              <Badge variant="info" withDot>
-                Info
-              </Badge>
-            </div>
-          </Card.Body>
-        </Card>
-
-        {/* Avatar Section */}
-        <Card className="mb-6">
-          <Card.Header>
-            <h3 className="text-lg font-semibold text-neutral-800">
-              Avatar Component
-            </h3>
-          </Card.Header>
-          <Card.Body>
-            <div className="flex flex-wrap items-center gap-4">
-              <Avatar size="xs" fallback="JD" />
-              <Avatar size="sm" fallback="RK" />
-              <Avatar size="md" fallback="SP" />
-              <Avatar size="lg" fallback="AS" />
-              <Avatar size="xl" fallback="VP" />
-              <Avatar size="2xl" fallback="PS" />
-            </div>
-            <div className="flex flex-wrap items-center gap-4 mt-4">
-              <Avatar src="https://i.pravatar.cc/150?img=1" alt="User 1" />
-              <Avatar src="https://i.pravatar.cc/150?img=2" alt="User 2" />
-              <Avatar src="https://i.pravatar.cc/150?img=3" alt="User 3" />
-              <Avatar src="" fallback="JD" />
+              <Button onClick={() => setIsModalOpen(true)}>Open Modal</Button>
+              <Button
+                variant="danger"
+                onClick={() => setIsConfirmModalOpen(true)}
+              >
+                Open Confirm Modal
+              </Button>
             </div>
           </Card.Body>
         </Card>
@@ -85,12 +48,84 @@ function App() {
             <Badge variant="success">✅ Card</Badge>
             <Badge variant="success">✅ Badge</Badge>
             <Badge variant="success">✅ Avatar</Badge>
-            <Badge variant="warning">⏳ Modal</Badge>
+            <Badge variant="success">✅ Modal</Badge>
             <Badge variant="warning">⏳ Toast</Badge>
             <Badge variant="warning">⏳ LoadingSpinner</Badge>
           </div>
         </div>
       </div>
+
+      {/* Standard Modal */}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="Sample Modal"
+        footer={
+          <>
+            <Button
+              variant="secondary"
+              fullWidth
+              onClick={() => setIsModalOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button fullWidth onClick={() => setIsModalOpen(false)}>
+              Save Changes
+            </Button>
+          </>
+        }
+      >
+        <div className="space-y-4">
+          <p className="text-neutral-600">
+            This is a sample modal. You can put any content here.
+          </p>
+          <Input
+            label="Email Address"
+            type="email"
+            placeholder="farmer@example.com"
+            helper="We'll never share your email"
+          />
+          <Input label="Message" placeholder="Enter your message" />
+        </div>
+      </Modal>
+
+      {/* Confirm Modal */}
+      <Modal
+        isOpen={isConfirmModalOpen}
+        onClose={() => setIsConfirmModalOpen(false)}
+        title="Confirm Delete"
+        maxWidth="sm"
+        footer={
+          <>
+            <Button
+              variant="secondary"
+              fullWidth
+              onClick={() => setIsConfirmModalOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="danger"
+              fullWidth
+              onClick={() => setIsConfirmModalOpen(false)}
+            >
+              Delete
+            </Button>
+          </>
+        }
+      >
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 bg-error-50 rounded-full flex items-center justify-center text-2xl flex-shrink-0">
+            ⚠️
+          </div>
+          <div>
+            <p className="font-medium text-neutral-800">Delete this item?</p>
+            <p className="text-sm text-neutral-500">
+              This action cannot be undone.
+            </p>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }
