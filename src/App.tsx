@@ -1,6 +1,8 @@
 import { Button } from "@/components/common/Button";
 import { Input } from "@/components/common/Input";
 import { Card } from "@/components/common/Card";
+import { Badge } from "@/components/common/Badge";
+import { Avatar } from "@/components/common/Avatar";
 
 function App() {
   return (
@@ -10,124 +12,82 @@ function App() {
           🌾 AgroLease - Component Library
         </h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Default Card */}
-          <Card>
-            <Card.Header>
-              <h3 className="text-lg font-semibold text-neutral-800">
-                Default Card
-              </h3>
-            </Card.Header>
-            <Card.Body>
-              <p className="text-neutral-600">
-                This is a default card with shadow.
-              </p>
-              <p className="text-neutral-600 mt-2">
-                Perfect for content display.
-              </p>
-            </Card.Body>
-            <Card.Footer>
-              <Button size="sm">Action</Button>
-            </Card.Footer>
-          </Card>
+        {/* Badge Section */}
+        <Card className="mb-6">
+          <Card.Header>
+            <h3 className="text-lg font-semibold text-neutral-800">
+              Badge Component
+            </h3>
+          </Card.Header>
+          <Card.Body>
+            <div className="flex flex-wrap gap-3">
+              <Badge>Default</Badge>
+              <Badge variant="primary">Primary</Badge>
+              <Badge variant="success">Success</Badge>
+              <Badge variant="warning">Warning</Badge>
+              <Badge variant="error">Error</Badge>
+              <Badge variant="info">Info</Badge>
+            </div>
+            <div className="flex flex-wrap gap-3 mt-4">
+              <Badge withDot>Default</Badge>
+              <Badge variant="primary" withDot>
+                Primary
+              </Badge>
+              <Badge variant="success" withDot>
+                Success
+              </Badge>
+              <Badge variant="warning" withDot>
+                Warning
+              </Badge>
+              <Badge variant="error" withDot>
+                Error
+              </Badge>
+              <Badge variant="info" withDot>
+                Info
+              </Badge>
+            </div>
+          </Card.Body>
+        </Card>
 
-          {/* Interactive Card */}
-          <Card variant="interactive" onClick={() => alert("Card clicked!")}>
-            <Card.Image src="" alt="Placeholder" />
-            <Card.Body>
-              <h3 className="text-lg font-semibold text-neutral-800">
-                Interactive Card
-              </h3>
-              <p className="text-neutral-600 mt-1">Hover me! Click me!</p>
-              <p className="text-sm text-primary-500 mt-2">Click anywhere →</p>
-            </Card.Body>
-          </Card>
+        {/* Avatar Section */}
+        <Card className="mb-6">
+          <Card.Header>
+            <h3 className="text-lg font-semibold text-neutral-800">
+              Avatar Component
+            </h3>
+          </Card.Header>
+          <Card.Body>
+            <div className="flex flex-wrap items-center gap-4">
+              <Avatar size="xs" fallback="JD" />
+              <Avatar size="sm" fallback="RK" />
+              <Avatar size="md" fallback="SP" />
+              <Avatar size="lg" fallback="AS" />
+              <Avatar size="xl" fallback="VP" />
+              <Avatar size="2xl" fallback="PS" />
+            </div>
+            <div className="flex flex-wrap items-center gap-4 mt-4">
+              <Avatar src="https://i.pravatar.cc/150?img=1" alt="User 1" />
+              <Avatar src="https://i.pravatar.cc/150?img=2" alt="User 2" />
+              <Avatar src="https://i.pravatar.cc/150?img=3" alt="User 3" />
+              <Avatar src="" fallback="JD" />
+            </div>
+          </Card.Body>
+        </Card>
 
-          {/* Selected Card */}
-          <Card variant="selected">
-            <Card.Header>
-              <h3 className="text-lg font-semibold text-primary-700">
-                Selected Card
-              </h3>
-            </Card.Header>
-            <Card.Body>
-              <p className="text-neutral-600">
-                This card is selected/highlighted.
-              </p>
-              <p className="text-sm text-primary-600 mt-2">
-                ✓ Currently active
-              </p>
-            </Card.Body>
-          </Card>
-
-          {/* Elevated Card */}
-          <Card variant="elevated">
-            <Card.Image src="" alt="Elevated card" />
-            <Card.Body>
-              <h3 className="text-lg font-semibold text-neutral-800">
-                Elevated Card
-              </h3>
-              <p className="text-neutral-600 mt-1">
-                Higher shadow for emphasis.
-              </p>
-              <div className="flex gap-2 mt-3">
-                <Button size="sm">Primary</Button>
-                <Button size="sm" variant="outline">
-                  Secondary
-                </Button>
-              </div>
-            </Card.Body>
-          </Card>
-
-          {/* Card with Form */}
-          <Card className="md:col-span-2">
-            <Card.Header>
-              <h3 className="text-lg font-semibold text-neutral-800">
-                Card with Form
-              </h3>
-            </Card.Header>
-            <Card.Body>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Input label="First Name" placeholder="Raj" required />
-                <Input label="Last Name" placeholder="Kumar" required />
-                <div className="md:col-span-2">
-                  <Input
-                    label="Email Address"
-                    type="email"
-                    placeholder="farmer@example.com"
-                    helper="We'll never share your email"
-                  />
-                </div>
-              </div>
-            </Card.Body>
-            <Card.Footer>
-              <Button>Submit</Button>
-              <Button variant="ghost" className="ml-2">
-                Cancel
-              </Button>
-            </Card.Footer>
-          </Card>
-        </div>
-
-        {/* Quick Navigation to Other Components */}
+        {/* Component Navigation */}
         <div className="mt-8 p-4 bg-white rounded-xl border border-neutral-200">
           <h3 className="text-sm font-medium text-neutral-500 mb-3">
-            Component Navigation
+            Components Built
           </h3>
           <div className="flex flex-wrap gap-2">
-            <Button size="sm">Button</Button>
-            <Button size="sm" variant="outline">
-              Input
-            </Button>
-            <Button size="sm" variant="primary">
-              Card
-            </Button>
-            <Button size="sm" variant="ghost">
-              Badge (Coming Soon)
-            </Button>
-            <Button size="sm" variant="ghost">
-              Avatar (Coming Soon)
-            </Button>
+            <Badge variant="success">✅ Button</Badge>
+            <Badge variant="success">✅ Input</Badge>
+            <Badge variant="success">✅ Card</Badge>
+            <Badge variant="success">✅ Badge</Badge>
+            <Badge variant="success">✅ Avatar</Badge>
+            <Badge variant="warning">⏳ Modal</Badge>
+            <Badge variant="warning">⏳ Toast</Badge>
+            <Badge variant="warning">⏳ LoadingSpinner</Badge>
           </div>
         </div>
       </div>
