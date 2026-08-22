@@ -1,56 +1,134 @@
 import { Button } from "@/components/common/Button";
 import { Input } from "@/components/common/Input";
+import { Card } from "@/components/common/Card";
 
 function App() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-neutral-50 p-4">
-      <div className="max-w-lg w-full space-y-8 bg-white rounded-xl p-6 md:p-8 shadow-sm border border-neutral-100">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold text-primary-500">🌾 AgroLease</h1>
-          <p className="text-neutral-600 mt-1">Input Component Demo</p>
+    <div className="min-h-screen bg-neutral-50 p-4 md:p-8">
+      <div className="max-w-6xl mx-auto">
+        <h1 className="text-3xl font-bold text-primary-500 text-center mb-8">
+          🌾 AgroLease - Component Library
+        </h1>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Default Card */}
+          <Card>
+            <Card.Header>
+              <h3 className="text-lg font-semibold text-neutral-800">
+                Default Card
+              </h3>
+            </Card.Header>
+            <Card.Body>
+              <p className="text-neutral-600">
+                This is a default card with shadow.
+              </p>
+              <p className="text-neutral-600 mt-2">
+                Perfect for content display.
+              </p>
+            </Card.Body>
+            <Card.Footer>
+              <Button size="sm">Action</Button>
+            </Card.Footer>
+          </Card>
+
+          {/* Interactive Card */}
+          <Card variant="interactive" onClick={() => alert("Card clicked!")}>
+            <Card.Image src="" alt="Placeholder" />
+            <Card.Body>
+              <h3 className="text-lg font-semibold text-neutral-800">
+                Interactive Card
+              </h3>
+              <p className="text-neutral-600 mt-1">Hover me! Click me!</p>
+              <p className="text-sm text-primary-500 mt-2">Click anywhere →</p>
+            </Card.Body>
+          </Card>
+
+          {/* Selected Card */}
+          <Card variant="selected">
+            <Card.Header>
+              <h3 className="text-lg font-semibold text-primary-700">
+                Selected Card
+              </h3>
+            </Card.Header>
+            <Card.Body>
+              <p className="text-neutral-600">
+                This card is selected/highlighted.
+              </p>
+              <p className="text-sm text-primary-600 mt-2">
+                ✓ Currently active
+              </p>
+            </Card.Body>
+          </Card>
+
+          {/* Elevated Card */}
+          <Card variant="elevated">
+            <Card.Image src="" alt="Elevated card" />
+            <Card.Body>
+              <h3 className="text-lg font-semibold text-neutral-800">
+                Elevated Card
+              </h3>
+              <p className="text-neutral-600 mt-1">
+                Higher shadow for emphasis.
+              </p>
+              <div className="flex gap-2 mt-3">
+                <Button size="sm">Primary</Button>
+                <Button size="sm" variant="outline">
+                  Secondary
+                </Button>
+              </div>
+            </Card.Body>
+          </Card>
+
+          {/* Card with Form */}
+          <Card className="md:col-span-2">
+            <Card.Header>
+              <h3 className="text-lg font-semibold text-neutral-800">
+                Card with Form
+              </h3>
+            </Card.Header>
+            <Card.Body>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Input label="First Name" placeholder="Raj" required />
+                <Input label="Last Name" placeholder="Kumar" required />
+                <div className="md:col-span-2">
+                  <Input
+                    label="Email Address"
+                    type="email"
+                    placeholder="farmer@example.com"
+                    helper="We'll never share your email"
+                  />
+                </div>
+              </div>
+            </Card.Body>
+            <Card.Footer>
+              <Button>Submit</Button>
+              <Button variant="ghost" className="ml-2">
+                Cancel
+              </Button>
+            </Card.Footer>
+          </Card>
         </div>
 
-        <div className="space-y-4">
-          {/* Basic Input */}
-          <Input
-            label="Email Address"
-            type="email"
-            placeholder="farmer@example.com"
-            helper="We'll never share your email"
-          />
-
-          {/* Input with Value */}
-          <Input label="Full Name" placeholder="Raj Kumar" value="Raj Kumar" />
-
-          {/* Required Input */}
-          <Input
-            label="Phone Number"
-            type="tel"
-            placeholder="9876543210"
-            required
-            helper="Enter 10-digit phone number"
-          />
-
-          {/* Password Input */}
-          <Input
-            label="Password"
-            type="password"
-            placeholder="Enter your password"
-            helper="Must be at least 8 characters"
-          />
-
-          {/* Error State */}
-          <Input
-            label="Username"
-            placeholder="Enter username"
-            value="invalid@"
-            error="Username must be at least 3 characters"
-          />
-
-          {/* Disabled Input */}
-          <Input label="Disabled Field" value="Cannot edit this" disabled />
-
-          <Button fullWidth>Submit</Button>
+        {/* Quick Navigation to Other Components */}
+        <div className="mt-8 p-4 bg-white rounded-xl border border-neutral-200">
+          <h3 className="text-sm font-medium text-neutral-500 mb-3">
+            Component Navigation
+          </h3>
+          <div className="flex flex-wrap gap-2">
+            <Button size="sm">Button</Button>
+            <Button size="sm" variant="outline">
+              Input
+            </Button>
+            <Button size="sm" variant="primary">
+              Card
+            </Button>
+            <Button size="sm" variant="ghost">
+              Badge (Coming Soon)
+            </Button>
+            <Button size="sm" variant="ghost">
+              Avatar (Coming Soon)
+            </Button>
+          </div>
         </div>
       </div>
     </div>
