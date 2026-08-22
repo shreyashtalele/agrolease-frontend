@@ -1,14 +1,25 @@
 import { useState } from "react";
 import { Button } from "@/components/common/Button";
-import { Input } from "@/components/common/Input";
 import { Card } from "@/components/common/Card";
 import { Badge } from "@/components/common/Badge";
-import { Avatar } from "@/components/common/Avatar";
+import { ToastContainer } from "@/components/common/Toast";
 import { Modal } from "@/components/common/Modal";
+import { LoadingSpinner } from "@/components/common/LoadingSpinner";
+import { useToast } from "@/hooks/useToast";
 
 function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const { success, error, info, warning, toasts, removeToast } = useToast();
+
+  const handleLoading = () => {
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+      success("Loading complete!");
+    }, 2000);
+  };
 
   return (
     <div className="min-h-screen bg-neutral-50 p-4 md:p-8">
@@ -17,12 +28,72 @@ function App() {
           🌾 AgroLease - Component Library
         </h1>
 
-        {/* Modal Section */}
+        {/* LoadingSpinner Section */}
         <Card className="mb-6">
           <Card.Header>
             <h3 className="text-lg font-semibold text-neutral-800">
-              Modal Component
+              LoadingSpinner Component
             </h3>
+          </Card.Header>
+          <Card.Body>
+            <div className="flex flex-wrap items-center gap-6">
+              <div className="flex flex-col items-center gap-2">
+                <LoadingSpinner size="sm" />
+                <span className="text-xs text-neutral-500">Small</span>
+              </div>
+              <div className="flex flex-col items-center gap-2">
+                <LoadingSpinner size="md" />
+                <span className="text-xs text-neutral-500">Medium</span>
+              </div>
+              <div className="flex flex-col items-center gap-2">
+                <LoadingSpinner size="lg" />
+                <span className="text-xs text-neutral-500">Large</span>
+              </div>
+              <Button onClick={handleLoading} loading={isLoading}>
+                {isLoading ? "Loading..." : "Simulate Loading"}
+              </Button>
+            </div>
+          </Card.Body>
+        </Card>
+
+        {/* Toast Section */}
+        <Card className="mb-6">
+          <Card.Header>
+            <h3 className="text-lg font-semibold text-neutral-800">
+              Toast Notifications
+            </h3>
+          </Card.Header>
+          <Card.Body>
+            <div className="flex flex-wrap gap-3">
+              <Button onClick={() => success("Success! Operation completed.")}>
+                Success
+              </Button>
+              <Button
+                variant="danger"
+                onClick={() => error("Error! Something went wrong.")}
+              >
+                Error
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => info("Info: New update available.")}
+              >
+                Info
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={() => warning("Warning: Please check your input.")}
+              >
+                Warning
+              </Button>
+            </div>
+          </Card.Body>
+        </Card>
+
+        {/* Modal Section */}
+        <Card className="mb-6">
+          <Card.Header>
+            <h3 className="text-lg font-semibold text-neutral-800">Modal</h3>
           </Card.Header>
           <Card.Body>
             <div className="flex flex-wrap gap-3">
@@ -31,7 +102,7 @@ function App() {
                 variant="danger"
                 onClick={() => setIsConfirmModalOpen(true)}
               >
-                Open Confirm Modal
+                Confirm Modal
               </Button>
             </div>
           </Card.Body>
@@ -49,11 +120,17 @@ function App() {
             <Badge variant="success">✅ Badge</Badge>
             <Badge variant="success">✅ Avatar</Badge>
             <Badge variant="success">✅ Modal</Badge>
-            <Badge variant="warning">⏳ Toast</Badge>
-            <Badge variant="warning">⏳ LoadingSpinner</Badge>
+            <Badge variant="success">✅ Toast</Badge>
+            <Badge variant="success">✅ LoadingSpinner</Badge>
           </div>
+          <p className="text-xs text-neutral-400 mt-3">
+            Phase 2 Complete! 🎉 All core components built.
+          </p>
         </div>
       </div>
+
+      {/* Toast Container */}
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
 
       {/* Standard Modal */}
       <Modal
@@ -70,23 +147,12 @@ function App() {
               Cancel
             </Button>
             <Button fullWidth onClick={() => setIsModalOpen(false)}>
-              Save Changes
+              Save
             </Button>
           </>
         }
       >
-        <div className="space-y-4">
-          <p className="text-neutral-600">
-            This is a sample modal. You can put any content here.
-          </p>
-          <Input
-            label="Email Address"
-            type="email"
-            placeholder="farmer@example.com"
-            helper="We'll never share your email"
-          />
-          <Input label="Message" placeholder="Enter your message" />
-        </div>
+        <p className="text-neutral-600">This is a sample modal with content.</p>
       </Modal>
 
       {/* Confirm Modal */}
