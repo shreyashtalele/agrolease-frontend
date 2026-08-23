@@ -10,6 +10,7 @@ import { EquipmentDetails } from "@/pages/equipment/EquipmentDetails";
 import { Bookings } from "@/pages/bookings/Bookings";
 import { MyListings } from "@/pages/listings/MyListings";
 import { AdminDashboard } from "@/pages/admin/AdminDashboard";
+import { Notifications } from "@/pages/notifications/Notifications";
 
 export const AppRouter = () => {
   return (
@@ -24,6 +25,7 @@ export const AppRouter = () => {
           <Route path="/equipment" element={<EquipmentList />} />
           <Route path="/equipment/:id" element={<EquipmentDetails />} />
           <Route path="/bookings" element={<Bookings />} />
+          <Route path="/notifications" element={<Notifications />} />
 
           {/* Provider Routes */}
           <Route element={<RoleBasedRoute allowedRoles={["provider"]} />}>
