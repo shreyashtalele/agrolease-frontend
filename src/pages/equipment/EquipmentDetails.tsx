@@ -12,12 +12,14 @@ import { Input } from "@/components/common/Input";
 import { useToast } from "@/hooks/useToast";
 import { useAuthStore } from "@/store/authStore";
 import { formatCurrency } from "@/utils/formatters";
+import { useRazorpay } from "@/hooks/useRazorpay";
 
 export const EquipmentDetails = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuthStore();
-  const { success, error: toastError } = useToast();
+  const { error: toastError } = useToast();
+  const { initializePayment } = useRazorpay();
 
   const [loading, setLoading] = useState(true);
   const [equipment, setEquipment] = useState<any>(null);
@@ -63,16 +65,24 @@ export const EquipmentDetails = () => {
 
     setIsBooking(true);
     try {
-      await bookingsApi.create({
+      const response = await bookingsApi.create({
         equipmentId: id!,
         bookingDateStart: bookingDates.startDate,
         bookingDateEnd: bookingDates.endDate,
         deliveryType: bookingDates.deliveryType,
         notes: bookingDates.notes,
       });
-      success("Booking created! Please complete payment.");
+
+      const booking = response.data;
       setShowBookingModal(false);
-      navigate("/bookings");
+
+      // Initialize Razorpay payment
+      await initializePayment({
+        orderId: booking._id,
+        amount: booking.totalPrice,
+        currency: "INR",
+        bookingId: booking._id,
+      });
     } catch (err) {
       toastError("Failed to create booking");
     } finally {

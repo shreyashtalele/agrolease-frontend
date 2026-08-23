@@ -11,6 +11,7 @@ import { Bookings } from "@/pages/bookings/Bookings";
 import { MyListings } from "@/pages/listings/MyListings";
 import { AdminDashboard } from "@/pages/admin/AdminDashboard";
 import { Notifications } from "@/pages/notifications/Notifications";
+import { PaymentHistory } from "@/pages/payments/PaymentHistory";
 
 export const AppRouter = () => {
   return (
@@ -26,6 +27,7 @@ export const AppRouter = () => {
           <Route path="/equipment/:id" element={<EquipmentDetails />} />
           <Route path="/bookings" element={<Bookings />} />
           <Route path="/notifications" element={<Notifications />} />
+          <Route path="/payments" element={<PaymentHistory />} />
 
           {/* Provider Routes */}
           <Route element={<RoleBasedRoute allowedRoles={["provider"]} />}>
