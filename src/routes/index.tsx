@@ -6,6 +6,7 @@ import { Register } from "@/pages/auth/Register";
 import { Dashboard } from "@/pages/dashboard/Dashboard";
 import { EquipmentList } from "@/pages/equipment/EquipmentList";
 import { EquipmentDetails } from "@/pages/equipment/EquipmentDetails";
+import { Bookings } from "@/pages/bookings/Bookings";
 
 export const AppRouter = () => {
   return (
@@ -19,6 +20,7 @@ export const AppRouter = () => {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/equipment" element={<EquipmentList />} />
           <Route path="/equipment/:id" element={<EquipmentDetails />} />
+          <Route path="/bookings" element={<Bookings />} />
         </Route>
       </Route>
     </Routes>
