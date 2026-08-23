@@ -4,6 +4,8 @@ import { PrivateRoute } from "./PrivateRoute";
 import { Login } from "@/pages/auth/Login";
 import { Register } from "@/pages/auth/Register";
 import { Dashboard } from "@/pages/dashboard/Dashboard";
+import { EquipmentList } from "@/pages/equipment/EquipmentList";
+import { EquipmentDetails } from "@/pages/equipment/EquipmentDetails";
 
 export const AppRouter = () => {
   return (
@@ -15,6 +17,8 @@ export const AppRouter = () => {
         <Route element={<Layout />}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/equipment" element={<EquipmentList />} />
+          <Route path="/equipment/:id" element={<EquipmentDetails />} />
         </Route>
       </Route>
     </Routes>
