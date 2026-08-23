@@ -6,7 +6,6 @@ import { notificationsApi } from "@/api/notifications";
 import { Button } from "@/components/common/Button";
 import { Card } from "@/components/common/Card";
 import { Badge } from "@/components/common/Badge";
-import { Avatar } from "@/components/common/Avatar";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { formatCurrency, formatDate } from "@/utils/formatters";
 

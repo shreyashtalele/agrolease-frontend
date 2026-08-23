@@ -1,12 +1,31 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store/authStore";
+import { notificationsApi } from "@/api/notifications";
 import { Avatar } from "@/components/common/Avatar";
 import { Button } from "@/components/common/Button";
 
 export const Header: React.FC = () => {
   const navigate = useNavigate();
   const { user, logout, isAuthenticated } = useAuthStore();
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadUnreadCount();
+      const interval = setInterval(loadUnreadCount, 30000); // Poll every 30s
+      return () => clearInterval(interval);
+    }
+  }, [isAuthenticated]);
+
+  const loadUnreadCount = async () => {
+    try {
+      const response = await notificationsApi.getUnreadCount();
+      setUnreadCount(response.data.count);
+    } catch (error) {
+      // Silent fail - don't show toast for background polling
+    }
+  };
 
   const handleLogout = () => {
     logout();
@@ -33,9 +52,11 @@ export const Header: React.FC = () => {
                 className="text-neutral-400 hover:text-neutral-600 transition-colors relative"
               >
                 🔔
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-error-500 text-white text-[10px] rounded-full flex items-center justify-center font-medium">
-                  3
-                </span>
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-error-500 text-white text-[10px] rounded-full flex items-center justify-center font-medium">
+                    {unreadCount > 99 ? "99+" : unreadCount}
+                  </span>
+                )}
               </Link>
 
               {/* User Avatar */}
