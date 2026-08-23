@@ -1,12 +1,14 @@
 import { Routes, Route } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { PrivateRoute } from "./PrivateRoute";
+import { RoleBasedRoute } from "./RoleBasedRoute";
 import { Login } from "@/pages/auth/Login";
 import { Register } from "@/pages/auth/Register";
 import { Dashboard } from "@/pages/dashboard/Dashboard";
 import { EquipmentList } from "@/pages/equipment/EquipmentList";
 import { EquipmentDetails } from "@/pages/equipment/EquipmentDetails";
 import { Bookings } from "@/pages/bookings/Bookings";
+import { MyListings } from "@/pages/listings/MyListings";
 
 export const AppRouter = () => {
   return (
@@ -21,6 +23,11 @@ export const AppRouter = () => {
           <Route path="/equipment" element={<EquipmentList />} />
           <Route path="/equipment/:id" element={<EquipmentDetails />} />
           <Route path="/bookings" element={<Bookings />} />
+
+          {/* Provider Routes */}
+          <Route element={<RoleBasedRoute allowedRoles={["provider"]} />}>
+            <Route path="/listings" element={<MyListings />} />
+          </Route>
         </Route>
       </Route>
     </Routes>
