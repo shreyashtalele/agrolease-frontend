@@ -489,3 +489,4 @@ export const EquipmentDetails = () => {
     </div>
   );
 };
+export default EquipmentDetails;

@@ -615,3 +615,4 @@ export const MyListings = () => {
     </div>
   );
 };
+export default MyListings;
