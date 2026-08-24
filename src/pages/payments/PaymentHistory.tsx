@@ -122,3 +122,4 @@ export const PaymentHistory = () => {
     </div>
   );
 };
+export default PaymentHistory;

@@ -4,9 +4,9 @@ import { equipmentApi } from "@/api/equipment";
 import { EquipmentCard } from "@/components/shared/EquipmentCard";
 import { FilterBar } from "@/components/shared/FilterBar";
 import { Button } from "@/components/common/Button";
-import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { useToast } from "@/hooks/useToast";
+import { SkeletonCard } from "@/components/common/Skeleton";
 
 export const EquipmentList = () => {
   const [searchParams] = useSearchParams();
@@ -85,8 +85,8 @@ export const EquipmentList = () => {
       />
 
       {loading ? (
-        <div className="flex justify-center py-12">
-          <LoadingSpinner size="lg" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <SkeletonCard count={8} />
         </div>
       ) : equipment.length === 0 ? (
         <EmptyState
@@ -135,3 +135,4 @@ export const EquipmentList = () => {
     </div>
   );
 };
+export default EquipmentList;
