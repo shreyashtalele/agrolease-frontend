@@ -43,7 +43,9 @@ export const EquipmentDetails = () => {
     setLoading(true);
     try {
       const response = await equipmentApi.getById(equipmentId);
-      setEquipment(response.data);
+      // ✅ FIX: Access the nested data properly
+      const equipmentData = (response.data as any)?.data || response.data;
+      setEquipment(equipmentData);
     } catch (err) {
       toastError("Failed to load equipment details");
       navigate("/equipment");
@@ -146,10 +148,10 @@ export const EquipmentDetails = () => {
         return (
           <div className="space-y-4">
             <p className="text-neutral-600 leading-relaxed whitespace-pre-line">
-              {equipment.description || "No description available."}
+              {equipment?.description || "No description available."}
             </p>
             <div className="flex flex-wrap gap-2">
-              {equipment.isVerified && (
+              {equipment?.isVerified && (
                 <Badge variant="success" withDot>
                   Verified Equipment
                 </Badge>
@@ -161,7 +163,7 @@ export const EquipmentDetails = () => {
       case "specifications":
         return (
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {Object.entries(equipment.specifications || {}).map(
+            {Object.entries(equipment?.specifications || {}).map(
               ([key, value]) => (
                 <div key={key} className="bg-neutral-50 rounded-lg p-3">
                   <p className="text-xs font-medium uppercase tracking-wider text-neutral-400">
@@ -214,7 +216,7 @@ export const EquipmentDetails = () => {
           Equipment
         </Link>
         <span>›</span>
-        <span className="text-neutral-700 font-medium">{equipment.title}</span>
+        <span className="text-neutral-700 font-medium">{equipment?.title}</span>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -225,17 +227,17 @@ export const EquipmentDetails = () => {
             <div className="relative">
               <img
                 src={
-                  equipment.images?.[0] ||
+                  equipment?.images?.[0] ||
                   "https://via.placeholder.com/800x400/2D5A27/FFFFFF?text=No+Image"
                 }
-                alt={equipment.title}
+                alt={equipment?.title}
                 className="w-full aspect-video object-cover"
               />
               <div className="absolute top-4 left-4">
-                {getStatusBadge(equipment.status)}
+                {getStatusBadge(equipment?.status)}
               </div>
               <div className="absolute top-4 right-4">
-                <Badge variant="primary">{equipment.category}</Badge>
+                <Badge variant="primary">{equipment?.category}</Badge>
               </div>
             </div>
           </Card>
@@ -245,11 +247,11 @@ export const EquipmentDetails = () => {
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h1 className="text-2xl md:text-3xl font-bold text-neutral-800">
-                  {equipment.title}
+                  {equipment?.title}
                 </h1>
                 <div className="flex items-center gap-3 mt-1">
                   <span className="text-sm text-neutral-500">
-                    📍 {equipment.location?.city}, {equipment.location?.state}
+                    📍 {equipment?.location?.city}, {equipment?.location?.state}
                   </span>
                 </div>
               </div>
@@ -259,13 +261,13 @@ export const EquipmentDetails = () => {
             <div className="mt-4 p-4 bg-primary-50 rounded-lg border border-primary-200">
               <div className="flex items-baseline gap-2">
                 <span className="text-3xl font-bold text-primary-600">
-                  {formatCurrency(equipment.rentalPricePerDay)}
+                  {formatCurrency(equipment?.rentalPricePerDay || 0)}
                 </span>
                 <span className="text-sm text-neutral-500">/ day</span>
               </div>
               <div className="flex flex-wrap gap-4 mt-2 text-sm text-neutral-600">
                 <span>
-                  🔒 {formatCurrency(equipment.securityDeposit || 0)} security
+                  🔒 {formatCurrency(equipment?.securityDeposit || 0)} security
                   deposit
                 </span>
                 <span>🕒 Minimum 2 days</span>
@@ -312,13 +314,13 @@ export const EquipmentDetails = () => {
               <div className="flex items-center justify-between text-sm">
                 <span className="text-neutral-500">Price per day</span>
                 <span className="font-medium text-neutral-800">
-                  {formatCurrency(equipment.rentalPricePerDay)}
+                  {formatCurrency(equipment?.rentalPricePerDay || 0)}
                 </span>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-neutral-500">Security deposit</span>
                 <span className="font-medium text-neutral-800">
-                  {formatCurrency(equipment.securityDeposit || 0)}
+                  {formatCurrency(equipment?.securityDeposit || 0)}
                 </span>
               </div>
               <div className="flex items-center justify-between text-sm">
@@ -332,8 +334,8 @@ export const EquipmentDetails = () => {
                   </span>
                   <span className="text-xl font-bold text-primary-600">
                     {formatCurrency(
-                      equipment.rentalPricePerDay * 2 +
-                        (equipment.securityDeposit || 0),
+                      (equipment?.rentalPricePerDay || 0) * 2 +
+                        (equipment?.securityDeposit || 0),
                     )}
                   </span>
                 </div>
@@ -343,11 +345,11 @@ export const EquipmentDetails = () => {
             <Button
               variant="primary"
               fullWidth
-              disabled={equipment.status !== "available"}
+              disabled={equipment?.status !== "available"}
               className="mt-4"
               onClick={() => setShowBookingModal(true)}
             >
-              {equipment.status === "available" ? "Book Now" : "Not Available"}
+              {equipment?.status === "available" ? "Book Now" : "Not Available"}
             </Button>
 
             <p className="text-xs text-neutral-400 text-center mt-3">
@@ -361,14 +363,14 @@ export const EquipmentDetails = () => {
             <div className="flex items-start gap-3">
               <Avatar
                 size="md"
-                fallback={`${equipment.owner?.firstName?.[0] || ""}${equipment.owner?.lastName?.[0] || ""}`}
+                fallback={`${equipment?.owner?.firstName?.[0] || ""}${equipment?.owner?.lastName?.[0] || ""}`}
               />
               <div>
                 <p className="font-medium text-neutral-800">
-                  {equipment.owner?.firstName} {equipment.owner?.lastName}
+                  {equipment?.owner?.firstName} {equipment?.owner?.lastName}
                 </p>
                 <p className="text-sm text-neutral-500">
-                  {equipment.location?.city}, {equipment.location?.state}
+                  {equipment?.location?.city}, {equipment?.location?.state}
                 </p>
                 <p className="text-xs text-success-600 mt-1">
                   ⚡ Responds within 1 hour
@@ -414,9 +416,9 @@ export const EquipmentDetails = () => {
               🚜
             </div>
             <div>
-              <p className="font-medium text-neutral-800">{equipment.title}</p>
+              <p className="font-medium text-neutral-800">{equipment?.title}</p>
               <p className="text-sm text-neutral-500">
-                {equipment.location?.city}, {equipment.location?.state}
+                {equipment?.location?.city}, {equipment?.location?.state}
               </p>
             </div>
           </div>
@@ -475,8 +477,8 @@ export const EquipmentDetails = () => {
               <span className="text-neutral-500">Total</span>
               <span className="font-bold text-primary-600">
                 {formatCurrency(
-                  equipment.rentalPricePerDay * 2 +
-                    (equipment.securityDeposit || 0),
+                  (equipment?.rentalPricePerDay || 0) * 2 +
+                    (equipment?.securityDeposit || 0),
                 )}
               </span>
             </div>

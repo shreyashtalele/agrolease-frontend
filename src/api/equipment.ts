@@ -31,5 +31,6 @@ export const equipmentApi = {
 
   getCategories: () => apiClient.get<string[]>("/equipment/categories"),
 
-  getMyListings: () => apiClient.get<Equipment[]>("/equipment/my/listings"),
+  getMyListings: () =>
+    apiClient.get<PaginatedResponse<Equipment>>("/equipment/my/listings"),
 };
