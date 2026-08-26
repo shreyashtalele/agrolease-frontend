@@ -75,17 +75,31 @@ export const EquipmentDetails = () => {
         notes: bookingDates.notes,
       });
 
-      const booking = response.data;
+      const booking = (response.data as any)?.data || response.data;
+
+      console.log("=== BOOKING CREATED ===");
+      console.log("Full response:", response);
+      console.log("Booking data:", booking);
+      console.log("Booking ID:", booking?._id);
+      console.log("======================");
+
+      if (!booking || !booking._id) {
+        toastError("Failed to get booking ID");
+        setIsBooking(false);
+        return;
+      }
+
       setShowBookingModal(false);
 
       // Initialize Razorpay payment
       await initializePayment({
         orderId: booking._id,
-        amount: booking.totalPrice,
+        amount: booking.totalPrice || 0,
         currency: "INR",
         bookingId: booking._id,
       });
     } catch (err) {
+      console.error("Booking error:", err);
       toastError("Failed to create booking");
     } finally {
       setIsBooking(false);
