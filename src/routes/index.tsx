@@ -14,6 +14,7 @@ const EquipmentDetails = lazy(
   () => import("@/pages/equipment/EquipmentDetails"),
 );
 const Bookings = lazy(() => import("@/pages/bookings/Bookings"));
+const BookingDetails = lazy(() => import("@/pages/bookings/BookingDetails")); // ✅ NEW
 const MyListings = lazy(() => import("@/pages/listings/MyListings"));
 const AdminDashboard = lazy(() => import("@/pages/admin/AdminDashboard"));
 const Notifications = lazy(() => import("@/pages/notifications/Notifications"));
@@ -90,6 +91,15 @@ export const AppRouter = () => {
             element={
               <LazyWrapper>
                 <Bookings />
+              </LazyWrapper>
+            }
+          />
+          {/* ✅ NEW: Booking Details Route */}
+          <Route
+            path="/bookings/:id"
+            element={
+              <LazyWrapper>
+                <BookingDetails />
               </LazyWrapper>
             }
           />

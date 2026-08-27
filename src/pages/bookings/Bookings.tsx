@@ -333,9 +333,14 @@ export const Bookings = () => {
                       )}
                       {booking.status === "confirmed" && (
                         <>
-                          <Button variant="outline" size="sm" fullWidth>
-                            View Details
-                          </Button>
+                          <Link
+                            to={`/bookings/${booking._id}`}
+                            className="w-full"
+                          >
+                            <Button variant="outline" size="sm" fullWidth>
+                              View Details
+                            </Button>
+                          </Link>
                           {!isProvider && (
                             <Button
                               variant="danger"
@@ -353,9 +358,14 @@ export const Bookings = () => {
                       )}
                       {(booking.status === "active" ||
                         booking.status === "completed") && (
-                        <Button variant="outline" size="sm" fullWidth>
-                          View Details
-                        </Button>
+                        <Link
+                          to={`/bookings/${booking._id}`}
+                          className="w-full"
+                        >
+                          <Button variant="outline" size="sm" fullWidth>
+                            View Details
+                          </Button>
+                        </Link>
                       )}
                       {booking.status === "cancelled" && (
                         <Button
