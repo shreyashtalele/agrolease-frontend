@@ -27,6 +27,7 @@ export interface Equipment {
     lastName: string;
   };
   isVerified: boolean;
+  viewsCount: number;
   createdAt: string;
   updatedAt: string;
 }

@@ -4,6 +4,7 @@ import { useAuthStore } from "@/store/authStore";
 import { Button } from "@/components/common/Button";
 import { Input } from "@/components/common/Input";
 import { Card } from "@/components/common/Card";
+import { authApi } from "@/api/auth";
 
 export const Login = () => {
   const navigate = useNavigate();
@@ -58,25 +59,18 @@ export const Login = () => {
     setErrors({});
 
     try {
-      // Simulate API call - replace with actual API
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      // Mock user data
-      const mockUser = {
-        id: "user_123",
+      const response = await authApi.login({
         email: formData.email,
-        firstName: "Raj",
-        lastName: "Kumar",
-        role: "farmer" as const,
-        phoneNumber: "9876543210",
-        isVerified: true,
-        isActive: true,
-      };
+        password: formData.password,
+      });
 
-      login(mockUser, "mock-token", "mock-refresh-token");
+      const { user, token, refreshToken } = response.data.data;
+      login(user, token, refreshToken);
       navigate("/dashboard");
-    } catch {
-      setErrors({ general: "Invalid email or password. Please try again." });
+    } catch (err: any) {
+      const message =
+        err.response?.data?.error?.message || "Invalid email or password";
+      setErrors({ general: message });
     } finally {
       setIsLoading(false);
     }

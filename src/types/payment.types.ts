@@ -15,13 +15,10 @@ export interface CreateOrderRequest {
 }
 
 export interface CreateOrderResponse {
-  success: boolean;
-  data: {
-    orderId: string;
-    amount: number;
-    currency: string;
-    keyId: string;
-  };
+  orderId: string;
+  amount: number;
+  currency: string;
+  keyId: string;
 }
 
 export interface VerifyPaymentRequest {

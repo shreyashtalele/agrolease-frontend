@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/common/Button";
 import { Input } from "@/components/common/Input";
 import { Card } from "@/components/common/Card";
+import { authApi } from "@/api/auth";
 
 export const Register = () => {
   const navigate = useNavigate();
@@ -71,15 +72,26 @@ export const Register = () => {
     }
 
     setIsLoading(true);
+    setErrors({});
+
     try {
-      // Simulate API call - replace with actual API
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      await authApi.register({
+        email: formData.email,
+        phoneNumber: formData.phoneNumber,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        password: formData.password,
+        role: formData.role,
+      });
+
       setSuccess(true);
       setTimeout(() => {
         navigate("/login");
       }, 1500);
-    } catch {
-      setErrors({ general: "Registration failed. Please try again." });
+    } catch (err: any) {
+      const message =
+        err.response?.data?.error?.message || "Registration failed";
+      setErrors({ general: message });
     } finally {
       setIsLoading(false);
     }
