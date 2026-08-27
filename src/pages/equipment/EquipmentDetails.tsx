@@ -43,7 +43,6 @@ export const EquipmentDetails = () => {
     setLoading(true);
     try {
       const response = await equipmentApi.getById(equipmentId);
-      // ✅ FIX: Access the nested data properly
       const equipmentData = (response.data as any)?.data || response.data;
       setEquipment(equipmentData);
     } catch (err) {
@@ -77,12 +76,6 @@ export const EquipmentDetails = () => {
 
       const booking = (response.data as any)?.data || response.data;
 
-      console.log("=== BOOKING CREATED ===");
-      console.log("Full response:", response);
-      console.log("Booking data:", booking);
-      console.log("Booking ID:", booking?._id);
-      console.log("======================");
-
       if (!booking || !booking._id) {
         toastError("Failed to get booking ID");
         setIsBooking(false);
@@ -91,7 +84,6 @@ export const EquipmentDetails = () => {
 
       setShowBookingModal(false);
 
-      // Initialize Razorpay payment
       await initializePayment({
         orderId: booking._id,
         amount: booking.totalPrice || 0,
@@ -221,7 +213,6 @@ export const EquipmentDetails = () => {
 
   return (
     <div className="space-y-6">
-      {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-neutral-500">
         <Link
           to="/equipment"
@@ -234,9 +225,7 @@ export const EquipmentDetails = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Image Gallery */}
           <Card className="overflow-hidden">
             <div className="relative">
               <img
@@ -256,7 +245,6 @@ export const EquipmentDetails = () => {
             </div>
           </Card>
 
-          {/* Title & Info */}
           <div>
             <div className="flex items-start justify-between gap-4">
               <div>
@@ -271,7 +259,6 @@ export const EquipmentDetails = () => {
               </div>
             </div>
 
-            {/* Price */}
             <div className="mt-4 p-4 bg-primary-50 rounded-lg border border-primary-200">
               <div className="flex items-baseline gap-2">
                 <span className="text-3xl font-bold text-primary-600">
@@ -289,7 +276,6 @@ export const EquipmentDetails = () => {
             </div>
           </div>
 
-          {/* Tabs */}
           <Card>
             <div className="border-b border-neutral-200">
               <div className="flex gap-1 px-4 pt-2">
@@ -316,9 +302,7 @@ export const EquipmentDetails = () => {
           </Card>
         </div>
 
-        {/* Sidebar */}
         <div className="space-y-6">
-          {/* Booking Card */}
           <Card variant="elevated" className="p-4 md:p-6 sticky top-24">
             <h3 className="font-semibold text-neutral-800 mb-4">
               Book This Equipment
@@ -371,7 +355,6 @@ export const EquipmentDetails = () => {
             </p>
           </Card>
 
-          {/* Owner Info */}
           <Card className="p-4">
             <h4 className="font-medium text-neutral-800 mb-3">Owner</h4>
             <div className="flex items-start gap-3">
@@ -398,7 +381,6 @@ export const EquipmentDetails = () => {
         </div>
       </div>
 
-      {/* Booking Modal */}
       <Modal
         isOpen={showBookingModal}
         onClose={() => setShowBookingModal(false)}
