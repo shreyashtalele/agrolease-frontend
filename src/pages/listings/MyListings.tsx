@@ -229,7 +229,7 @@ export const MyListings = () => {
       quantity: "1",
       city: listing.location.city,
       state: listing.location.state,
-      pincode: "",
+      pincode: listing.location.pincode || "",
       brand: listing.specifications?.brand || "",
       model: listing.specifications?.model || "",
       modelYear: listing.specifications?.modelYear?.toString() || "",
