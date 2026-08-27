@@ -56,7 +56,7 @@ export const Dashboard = () => {
         totalSpent: total,
       });
 
-      // ✅ Load notifications list (not just count)
+      // Load notifications list (not just count)
       const notifRes = await notificationsApi.list({ limit: 3 });
       const notifData = notifRes.data.data || [];
       setNotifications(notifData);
@@ -240,7 +240,7 @@ export const Dashboard = () => {
               </Link>
             </div>
 
-            <Card className="p-4">
+            <Card className="p-4 max-h-[220px] overflow-y-auto">
               {notifications.length === 0 ? (
                 <p className="text-sm text-neutral-500 text-center py-4">
                   No new notifications
@@ -256,7 +256,9 @@ export const Dashboard = () => {
                           : ""
                       }`}
                     >
-                      <p className="text-neutral-700">{notif.message}</p>
+                      <p className="text-neutral-700 line-clamp-2">
+                        {notif.message}
+                      </p>
                       <p className="text-xs text-neutral-400 mt-1">
                         {formatRelativeTime(notif.createdAt)}
                       </p>
@@ -278,26 +280,26 @@ export const Dashboard = () => {
               Quick Actions
             </h2>
             <Card className="p-4 bg-primary-50 border-primary-200">
-              <div className="space-y-2">
-                <Link to="/equipment">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <Link to="/equipment" className="w-full">
                   <Button variant="primary" size="sm" fullWidth>
                     📅 New Booking
                   </Button>
                 </Link>
-                <Link to="/bookings">
+                <Link to="/bookings" className="w-full">
                   <Button variant="outline" size="sm" fullWidth>
                     📋 My Bookings
                   </Button>
                 </Link>
                 {isProvider && (
-                  <Link to="/listings">
+                  <Link to="/listings" className="w-full">
                     <Button variant="outline" size="sm" fullWidth>
                       📦 My Listings
                     </Button>
                   </Link>
                 )}
                 {isAdmin && (
-                  <Link to="/admin">
+                  <Link to="/admin" className="w-full">
                     <Button variant="danger" size="sm" fullWidth>
                       ⚙️ Admin Dashboard
                     </Button>
@@ -311,4 +313,5 @@ export const Dashboard = () => {
     </div>
   );
 };
+
 export default Dashboard;
