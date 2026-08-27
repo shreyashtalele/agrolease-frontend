@@ -71,9 +71,11 @@ export const MyListings = () => {
     setLoading(true);
     try {
       const response = await equipmentApi.getMyListings();
-      const listingsWithUI = (response.data || []).map((item: Equipment) => ({
+      // Get the array from the paginated response
+      const listingsData = response.data?.data || [];
+      const listingsWithUI = listingsData.map((item: Equipment) => ({
         ...item,
-        views: 0,
+        views: item.viewsCount || 0,
         bookings: 0,
       }));
       setListings(listingsWithUI);
@@ -227,7 +229,7 @@ export const MyListings = () => {
       quantity: "1",
       city: listing.location.city,
       state: listing.location.state,
-      pincode: "",
+      pincode: listing.location.pincode || "",
       brand: listing.specifications?.brand || "",
       model: listing.specifications?.model || "",
       modelYear: listing.specifications?.modelYear?.toString() || "",
@@ -519,7 +521,7 @@ export const MyListings = () => {
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Input
               label="City"
               name="city"
@@ -536,8 +538,18 @@ export const MyListings = () => {
               onChange={handleChange}
               required
             />
+            <Input
+              label="Pincode"
+              name="pincode"
+              type="text"
+              placeholder="411001"
+              value={formData.pincode}
+              onChange={handleChange}
+              required
+              helper="Must be 5-6 digits"
+              maxLength={6}
+            />
           </div>
-
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Input
               label="Brand"

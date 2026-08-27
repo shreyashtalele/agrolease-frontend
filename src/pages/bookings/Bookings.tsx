@@ -44,7 +44,8 @@ export const Bookings = () => {
       const response = await bookingsApi.list({
         type: user?.role === "provider" ? "owner" : "renter",
       });
-      setBookings(response.data.data || []);
+      const bookingsData = (response.data as any)?.data || response.data || [];
+      setBookings(bookingsData);
     } catch (err) {
       toastError("Failed to load bookings");
     } finally {
@@ -96,7 +97,7 @@ export const Bookings = () => {
 
   const getPaymentStatusBadge = (status: string) => {
     switch (status) {
-      case "paid":
+      case "completed":
         return <Badge variant="success">Paid</Badge>;
       case "pending":
         return <Badge variant="warning">Pending</Badge>;
@@ -233,97 +234,77 @@ export const Bookings = () => {
         </div>
       ) : (
         <div className="space-y-4">
-          {filteredBookings.map((booking) => (
-            <Card
-              key={booking._id}
-              className={`p-4 md:p-6 hover:shadow-md transition-shadow ${getStatusColor(booking.status)}`}
-            >
-              <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-                {/* Left: Equipment Info */}
-                <div className="flex items-start gap-4">
-                  <div className="w-16 h-16 bg-neutral-100 rounded-lg flex items-center justify-center text-3xl flex-shrink-0">
-                    🚜
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-neutral-800">
-                      {booking.equipmentId?.title || "Equipment"}
-                    </h3>
-                    <p className="text-sm text-neutral-500">
-                      📍 {booking.equipmentId?.location?.city || "N/A"},{" "}
-                      {booking.equipmentId?.location?.state || "N/A"}
-                    </p>
-                    <div className="flex flex-wrap items-center gap-2 mt-2">
-                      {getStatusBadge(booking.status)}
-                      {getPaymentStatusBadge(
-                        booking.paymentStatus || "pending",
-                      )}
-                    </div>
-                  </div>
-                </div>
+          {filteredBookings.map((booking) => {
+            // ✅ FIX: Use correct field names - "equipment", not "equipmentId"
+            const equipment = booking.equipment;
+            const equipmentTitle = equipment?.title || "Equipment";
+            const equipmentCity = equipment?.location?.city || "N/A";
+            const equipmentState = equipment?.location?.state || "N/A";
 
-                {/* Right: Details & Actions */}
-                <div className="flex flex-col sm:flex-row sm:items-end gap-4 sm:gap-6">
-                  <div className="text-right">
-                    <div className="text-sm text-neutral-500">
-                      {formatDateRange(
-                        booking.bookingDateStart,
-                        booking.bookingDateEnd,
-                      )}
+            // ✅ FIX: Use correct field names - "renter", not "renterId"
+            const renter = booking.renter;
+            const owner = booking.owner;
+
+            return (
+              <Card
+                key={booking._id}
+                className={`p-4 md:p-6 hover:shadow-md transition-shadow ${getStatusColor(
+                  booking.status,
+                )}`}
+              >
+                <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                  {/* Left: Equipment Info */}
+                  <div className="flex items-start gap-4">
+                    <div className="w-16 h-16 bg-neutral-100 rounded-lg flex items-center justify-center text-3xl flex-shrink-0">
+                      🚜
                     </div>
-                    <div className="text-sm text-neutral-500">
-                      {formatCurrency(booking.totalPrice)}
-                    </div>
-                    <div className="text-xs text-neutral-400 mt-1">
-                      Booked on {formatDate(booking.createdAt)}
+                    <div>
+                      <h3 className="font-semibold text-neutral-800">
+                        {equipmentTitle}
+                      </h3>
+                      <p className="text-sm text-neutral-500">
+                        📍 {equipmentCity}, {equipmentState}
+                      </p>
+                      <div className="flex flex-wrap items-center gap-2 mt-2">
+                        {getStatusBadge(booking.status)}
+                        {getPaymentStatusBadge(
+                          booking.payment?.status || "pending",
+                        )}
+                      </div>
                     </div>
                   </div>
 
-                  <div className="flex flex-col gap-2 min-w-[100px]">
-                    {booking.status === "pending" && isProvider && (
-                      <>
-                        <Button
-                          variant="primary"
-                          size="sm"
-                          fullWidth
-                          onClick={() => {
-                            setSelectedBooking(booking);
-                            setShowConfirmModal(true);
-                          }}
-                        >
-                          Confirm
-                        </Button>
-                        <Button
-                          variant="danger"
-                          size="sm"
-                          fullWidth
-                          onClick={() => {
-                            setSelectedBooking(booking);
-                            setShowCancelModal(true);
-                          }}
-                        >
-                          Cancel
-                        </Button>
-                      </>
-                    )}
-                    {booking.status === "pending" && !isProvider && (
-                      <Button
-                        variant="danger"
-                        size="sm"
-                        fullWidth
-                        onClick={() => {
-                          setSelectedBooking(booking);
-                          setShowCancelModal(true);
-                        }}
-                      >
-                        Cancel
-                      </Button>
-                    )}
-                    {booking.status === "confirmed" && (
-                      <>
-                        <Button variant="outline" size="sm" fullWidth>
-                          View Details
-                        </Button>
-                        {!isProvider && (
+                  {/* Right: Details & Actions */}
+                  <div className="flex flex-col sm:flex-row sm:items-end gap-4 sm:gap-6">
+                    <div className="text-right">
+                      <div className="text-sm text-neutral-500">
+                        {formatDateRange(
+                          booking.bookingDateStart,
+                          booking.bookingDateEnd,
+                        )}
+                      </div>
+                      <div className="text-sm text-neutral-500">
+                        {formatCurrency(booking.totalPrice)}
+                      </div>
+                      <div className="text-xs text-neutral-400 mt-1">
+                        Booked on {formatDate(booking.createdAt)}
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col gap-2 min-w-[100px]">
+                      {booking.status === "pending" && isProvider && (
+                        <>
+                          <Button
+                            variant="primary"
+                            size="sm"
+                            fullWidth
+                            onClick={() => {
+                              setSelectedBooking(booking);
+                              setShowConfirmModal(true);
+                            }}
+                          >
+                            Confirm
+                          </Button>
                           <Button
                             variant="danger"
                             size="sm"
@@ -335,52 +316,90 @@ export const Bookings = () => {
                           >
                             Cancel
                           </Button>
-                        )}
-                      </>
-                    )}
-                    {(booking.status === "active" ||
-                      booking.status === "completed") && (
-                      <Button variant="outline" size="sm" fullWidth>
-                        View Details
-                      </Button>
-                    )}
-                    {booking.status === "cancelled" && (
-                      <Button variant="secondary" size="sm" fullWidth disabled>
-                        Cancelled
-                      </Button>
-                    )}
+                        </>
+                      )}
+                      {booking.status === "pending" && !isProvider && (
+                        <Button
+                          variant="danger"
+                          size="sm"
+                          fullWidth
+                          onClick={() => {
+                            setSelectedBooking(booking);
+                            setShowCancelModal(true);
+                          }}
+                        >
+                          Cancel
+                        </Button>
+                      )}
+                      {booking.status === "confirmed" && (
+                        <>
+                          <Button variant="outline" size="sm" fullWidth>
+                            View Details
+                          </Button>
+                          {!isProvider && (
+                            <Button
+                              variant="danger"
+                              size="sm"
+                              fullWidth
+                              onClick={() => {
+                                setSelectedBooking(booking);
+                                setShowCancelModal(true);
+                              }}
+                            >
+                              Cancel
+                            </Button>
+                          )}
+                        </>
+                      )}
+                      {(booking.status === "active" ||
+                        booking.status === "completed") && (
+                        <Button variant="outline" size="sm" fullWidth>
+                          View Details
+                        </Button>
+                      )}
+                      {booking.status === "cancelled" && (
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          fullWidth
+                          disabled
+                        >
+                          Cancelled
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Owner/Renter Info */}
-              <div className="mt-4 pt-4 border-t border-neutral-100">
-                <div className="flex items-center gap-3 text-sm">
-                  <Avatar
-                    size="sm"
-                    fallback={
-                      isProvider
-                        ? booking.renterId?.firstName?.[0] || "U"
-                        : booking.ownerId?.firstName?.[0] || "U"
-                    }
-                  />
-                  <div>
-                    <p className="font-medium text-neutral-700">
-                      {isProvider
-                        ? `${booking.renterId?.firstName || "User"} ${booking.renterId?.lastName || ""}`
-                        : `${booking.ownerId?.firstName || "Owner"} ${booking.ownerId?.lastName || ""}`}
-                    </p>
-                    <p className="text-neutral-500 text-xs">
-                      {isProvider ? "Renter" : "Owner"}
-                    </p>
+                {/* Owner/Renter Info */}
+                <div className="mt-4 pt-4 border-t border-neutral-100">
+                  <div className="flex items-center gap-3 text-sm">
+                    <Avatar
+                      size="sm"
+                      fallback={
+                        isProvider
+                          ? renter?.firstName?.[0] || "U"
+                          : owner?.firstName?.[0] || "U"
+                      }
+                    />
+                    <div>
+                      <p className="font-medium text-neutral-700">
+                        {isProvider
+                          ? `${renter?.firstName || "User"} ${renter?.lastName || ""}`
+                          : `${owner?.firstName || "Owner"} ${owner?.lastName || ""}`}
+                      </p>
+                      <p className="text-neutral-500 text-xs">
+                        {isProvider ? "Renter" : "Owner"}
+                      </p>
+                    </div>
+                    <Button variant="ghost" size="sm" className="ml-auto">
+                      Contact
+                    </Button>
                   </div>
-                  <Button variant="ghost" size="sm" className="ml-auto">
-                    Contact
-                  </Button>
                 </div>
-              </div>
-            </Card>
-          ))}
+              </Card>
+            );
+          })}
         </div>
       )}
 
@@ -423,7 +442,7 @@ export const Bookings = () => {
           <div>
             <p className="font-medium text-neutral-800">Cancel this booking?</p>
             <p className="text-sm text-neutral-500">
-              {selectedBooking?.equipmentId?.title}
+              {selectedBooking?.equipment?.title || "Equipment"}
             </p>
             <p className="text-xs text-error-600 mt-2">
               This action cannot be undone.
@@ -473,7 +492,7 @@ export const Bookings = () => {
               Confirm this booking?
             </p>
             <p className="text-sm text-neutral-500">
-              {selectedBooking?.equipmentId?.title}
+              {selectedBooking?.equipment?.title || "Equipment"}
             </p>
             <p className="text-xs text-success-600 mt-2">
               This will confirm the booking for the renter.
