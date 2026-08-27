@@ -53,6 +53,25 @@ export const EquipmentDetails = () => {
     }
   };
 
+  // Helper to calculate number of days between two dates
+  const calculateDays = (startDate: string, endDate: string): number => {
+    if (!startDate || !endDate) return 0;
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const diffTime = Math.abs(end.getTime() - start.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays > 0 ? diffDays : 0;
+  };
+
+  // Calculate total days and amount dynamically
+  const totalDays = calculateDays(bookingDates.startDate, bookingDates.endDate);
+  const totalAmount =
+    totalDays > 0
+      ? (equipment?.rentalPricePerDay || 0) * totalDays +
+        (equipment?.securityDeposit || 0)
+      : (equipment?.rentalPricePerDay || 0) * 2 +
+        (equipment?.securityDeposit || 0);
+
   const handleBooking = async () => {
     if (!user) {
       navigate("/login");
@@ -61,6 +80,19 @@ export const EquipmentDetails = () => {
 
     if (!bookingDates.startDate || !bookingDates.endDate) {
       toastError("Please select booking dates");
+      return;
+    }
+
+    // ✅ Validate: end date must be after start date
+    const days = calculateDays(bookingDates.startDate, bookingDates.endDate);
+    if (days === 0) {
+      toastError("End date must be after start date");
+      return;
+    }
+
+    // ✅ CHECK: Prevent provider from booking their own equipment
+    if (equipment?.owner?._id === user?.id) {
+      toastError("You cannot book your own equipment");
       return;
     }
 
@@ -84,9 +116,10 @@ export const EquipmentDetails = () => {
 
       setShowBookingModal(false);
 
+      // ✅ Use the calculated total amount
       await initializePayment({
         orderId: booking._id,
-        amount: booking.totalPrice || 0,
+        amount: totalAmount,
         currency: "INR",
         bookingId: booking._id,
       });
@@ -211,6 +244,9 @@ export const EquipmentDetails = () => {
     }
   };
 
+  // Check if current user is the owner
+  const isOwner = equipment?.owner?._id === user?.id;
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-2 text-sm text-neutral-500">
@@ -305,7 +341,7 @@ export const EquipmentDetails = () => {
         <div className="space-y-6">
           <Card variant="elevated" className="p-4 md:p-6 sticky top-24">
             <h3 className="font-semibold text-neutral-800 mb-4">
-              Book This Equipment
+              {isOwner ? "Your Equipment" : "Book This Equipment"}
             </h3>
 
             <div className="space-y-3">
@@ -328,13 +364,10 @@ export const EquipmentDetails = () => {
               <div className="border-t border-neutral-200 pt-3 mt-1">
                 <div className="flex items-center justify-between">
                   <span className="font-medium text-neutral-800">
-                    Total (2 days)
+                    Total ({totalDays || 2} days)
                   </span>
                   <span className="text-xl font-bold text-primary-600">
-                    {formatCurrency(
-                      (equipment?.rentalPricePerDay || 0) * 2 +
-                        (equipment?.securityDeposit || 0),
-                    )}
+                    {formatCurrency(totalAmount)}
                   </span>
                 </div>
               </div>
@@ -343,16 +376,27 @@ export const EquipmentDetails = () => {
             <Button
               variant="primary"
               fullWidth
-              disabled={equipment?.status !== "available"}
+              disabled={equipment?.status !== "available" || isOwner}
               className="mt-4"
               onClick={() => setShowBookingModal(true)}
             >
-              {equipment?.status === "available" ? "Book Now" : "Not Available"}
+              {isOwner
+                ? "Your Equipment"
+                : equipment?.status === "available"
+                  ? "Book Now"
+                  : "Not Available"}
             </Button>
 
-            <p className="text-xs text-neutral-400 text-center mt-3">
-              You won't be charged yet
-            </p>
+            {isOwner && (
+              <p className="text-xs text-neutral-400 text-center mt-3">
+                You cannot book your own equipment
+              </p>
+            )}
+            {!isOwner && (
+              <p className="text-xs text-neutral-400 text-center mt-3">
+                You won't be charged yet
+              </p>
+            )}
           </Card>
 
           <Card className="p-4">
@@ -470,14 +514,20 @@ export const EquipmentDetails = () => {
 
           <div className="bg-neutral-50 rounded-lg p-4 space-y-2">
             <div className="flex justify-between text-sm">
-              <span className="text-neutral-500">Total</span>
+              <span className="text-neutral-500">
+                {totalDays > 0 ? `${totalDays} days × ` : ""}
+                {formatCurrency(equipment?.rentalPricePerDay || 0)}/day
+                {equipment?.securityDeposit > 0 && ` + deposit`}
+              </span>
               <span className="font-bold text-primary-600">
-                {formatCurrency(
-                  (equipment?.rentalPricePerDay || 0) * 2 +
-                    (equipment?.securityDeposit || 0),
-                )}
+                {formatCurrency(totalAmount)}
               </span>
             </div>
+            {totalDays === 0 && (
+              <p className="text-xs text-warning-600">
+                ⚠️ Please select start and end dates to see the total
+              </p>
+            )}
             <p className="text-xs text-neutral-400">
               You'll be redirected to Razorpay for secure payment
             </p>

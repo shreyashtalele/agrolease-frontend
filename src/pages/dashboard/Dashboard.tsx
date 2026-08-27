@@ -7,7 +7,11 @@ import { Button } from "@/components/common/Button";
 import { Card } from "@/components/common/Card";
 import { Badge } from "@/components/common/Badge";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
-import { formatCurrency, formatDate } from "@/utils/formatters";
+import {
+  formatCurrency,
+  formatDate,
+  formatRelativeTime,
+} from "@/utils/formatters";
 
 export const Dashboard = () => {
   const { user } = useAuthStore();
@@ -19,6 +23,7 @@ export const Dashboard = () => {
     totalSpent: 0,
   });
   const [recentBookings, setRecentBookings] = useState<any[]>([]);
+  const [notifications, setNotifications] = useState<any[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
@@ -51,9 +56,11 @@ export const Dashboard = () => {
         totalSpent: total,
       });
 
-      // Load notifications count
-      const notifRes = await notificationsApi.getUnreadCount();
-      setUnreadCount(notifRes.data.count || 0);
+      // ✅ Load notifications list (not just count)
+      const notifRes = await notificationsApi.list({ limit: 3 });
+      const notifData = notifRes.data.data || [];
+      setNotifications(notifData);
+      setUnreadCount(notifData.filter((n: any) => !n.isRead).length);
     } catch (error) {
       console.error("Failed to load dashboard data:", error);
     } finally {
@@ -199,7 +206,7 @@ export const Dashboard = () => {
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div>
                       <h4 className="font-medium text-neutral-800">
-                        {booking.equipmentId?.title || "Equipment"}
+                        {booking.equipment?.title || "Equipment"}
                       </h4>
                       <p className="text-sm text-neutral-500">
                         {formatDate(booking.bookingDateStart)} -{" "}
@@ -234,27 +241,32 @@ export const Dashboard = () => {
             </div>
 
             <Card className="p-4">
-              {unreadCount === 0 ? (
+              {notifications.length === 0 ? (
                 <p className="text-sm text-neutral-500 text-center py-4">
                   No new notifications
                 </p>
               ) : (
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center text-lg">
-                    🔔
-                  </div>
-                  <div>
-                    <p className="font-medium text-neutral-800">
-                      {unreadCount} unread{" "}
-                      {unreadCount === 1 ? "notification" : "notifications"}
-                    </p>
-                    <Link
-                      to="/notifications"
-                      className="text-sm text-primary-500 hover:text-primary-600 transition-colors"
+                <div className="space-y-3">
+                  {notifications.slice(0, 3).map((notif) => (
+                    <div
+                      key={notif._id}
+                      className={`p-3 rounded-lg text-sm ${
+                        !notif.isRead
+                          ? "bg-primary-50 border-l-4 border-primary-500"
+                          : ""
+                      }`}
                     >
-                      Read now →
-                    </Link>
-                  </div>
+                      <p className="text-neutral-700">{notif.message}</p>
+                      <p className="text-xs text-neutral-400 mt-1">
+                        {formatRelativeTime(notif.createdAt)}
+                      </p>
+                    </div>
+                  ))}
+                  {notifications.length > 3 && (
+                    <p className="text-xs text-primary-500 text-center">
+                      +{notifications.length - 3} more notifications
+                    </p>
+                  )}
                 </div>
               )}
             </Card>
