@@ -224,9 +224,44 @@ export const Dashboard = () => {
           )}
         </div>
 
-        {/* Right Column: Notifications & Quick Actions */}
+        {/* Right Column: Quick Actions & Notifications */}
         <div className="space-y-6">
-          {/* Notifications */}
+          {/* Quick Actions - NOW FIRST */}
+          <div>
+            <h2 className="text-lg font-semibold text-neutral-800 mb-4">
+              Quick Actions
+            </h2>
+            <Card className="p-4 bg-primary-50 border-primary-200">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <Link to="/equipment" className="w-full">
+                  <Button variant="primary" size="sm" fullWidth>
+                    📅 New Booking
+                  </Button>
+                </Link>
+                <Link to="/bookings" className="w-full">
+                  <Button variant="outline" size="sm" fullWidth>
+                    📋 My Bookings
+                  </Button>
+                </Link>
+                {isProvider && (
+                  <Link to="/listings" className="w-full">
+                    <Button variant="outline" size="sm" fullWidth>
+                      📦 My Listings
+                    </Button>
+                  </Link>
+                )}
+                {isAdmin && (
+                  <Link to="/admin" className="w-full">
+                    <Button variant="danger" size="sm" fullWidth>
+                      ⚙️ Admin Dashboard
+                    </Button>
+                  </Link>
+                )}
+              </div>
+            </Card>
+          </div>
+
+          {/* Notifications - NOW SECOND */}
           <div>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-neutral-800">
@@ -271,41 +306,6 @@ export const Dashboard = () => {
                   )}
                 </div>
               )}
-            </Card>
-          </div>
-
-          {/* Quick Actions */}
-          <div>
-            <h2 className="text-lg font-semibold text-neutral-800 mb-4">
-              Quick Actions
-            </h2>
-            <Card className="p-4 bg-primary-50 border-primary-200">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                <Link to="/equipment" className="w-full">
-                  <Button variant="primary" size="sm" fullWidth>
-                    📅 New Booking
-                  </Button>
-                </Link>
-                <Link to="/bookings" className="w-full">
-                  <Button variant="outline" size="sm" fullWidth>
-                    📋 My Bookings
-                  </Button>
-                </Link>
-                {isProvider && (
-                  <Link to="/listings" className="w-full">
-                    <Button variant="outline" size="sm" fullWidth>
-                      📦 My Listings
-                    </Button>
-                  </Link>
-                )}
-                {isAdmin && (
-                  <Link to="/admin" className="w-full">
-                    <Button variant="danger" size="sm" fullWidth>
-                      ⚙️ Admin Dashboard
-                    </Button>
-                  </Link>
-                )}
-              </div>
             </Card>
           </div>
         </div>
