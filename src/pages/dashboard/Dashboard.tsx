@@ -70,7 +70,6 @@ export const Dashboard = () => {
       if (isProvider) {
         try {
           const listingsRes = await equipmentApi.getMyListings();
-          // ✅ FIX: Access data.data, not data directly
           const listings = listingsRes.data.data || [];
           const totalListings = listings.length;
           const totalRevenue = completed.reduce(
@@ -270,6 +269,13 @@ export const Dashboard = () => {
                       <h4 className="font-medium text-neutral-800">
                         {booking.equipment?.title || "Equipment"}
                       </h4>
+                      {/* ✅ Show renter name for providers */}
+                      {isProvider && booking.renter && (
+                        <p className="text-sm text-neutral-500">
+                          👤 {booking.renter.firstName}{" "}
+                          {booking.renter.lastName}
+                        </p>
+                      )}
                       <p className="text-sm text-neutral-500">
                         {formatDate(booking.bookingDateStart)} -{" "}
                         {formatDate(booking.bookingDateEnd)}
