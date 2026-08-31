@@ -1,4 +1,17 @@
 import { useState, useEffect } from "react";
+import {
+  BarChart3,
+  Users,
+  Package,
+  List,
+  Settings,
+  CheckCircle,
+  Clock,
+  XCircle,
+  Search,
+  FileText,
+  DollarSign,
+} from "lucide-react";
 import { adminApi } from "@/api/admin";
 import { Button } from "@/components/common/Button";
 import { Card } from "@/components/common/Card";
@@ -35,11 +48,19 @@ export const AdminDashboard = () => {
   const [selectedEquipment, setSelectedEquipment] = useState<any>(null);
   const [isActionLoading, setIsActionLoading] = useState(false);
 
-  const tabs: { id: Tab; label: string }[] = [
-    { id: "overview", label: "📊 Overview" },
-    { id: "users", label: "👥 Users" },
-    { id: "equipment", label: "📦 Equipment" },
-    { id: "bookings", label: "📋 Bookings" },
+  const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
+    {
+      id: "overview",
+      label: "Overview",
+      icon: <BarChart3 className="w-4 h-4" />,
+    },
+    { id: "users", label: "Users", icon: <Users className="w-4 h-4" /> },
+    {
+      id: "equipment",
+      label: "Equipment",
+      icon: <Package className="w-4 h-4" />,
+    },
+    { id: "bookings", label: "Bookings", icon: <List className="w-4 h-4" /> },
   ];
 
   const loadDashboardData = async () => {
@@ -53,10 +74,23 @@ export const AdminDashboard = () => {
           adminApi.listBookings({ limit: 10 }),
         ],
       );
-      setStats(statsRes.data);
-      setUsers(usersRes.data.data || []);
-      setEquipment(equipmentRes.data.data || []);
-      setBookings(bookingsRes.data.data || []);
+
+      const dashboardData = (statsRes.data as any)?.data || statsRes.data;
+
+      setStats({
+        totalUsers: dashboardData?.users?.total || 0,
+        activeUsers: dashboardData?.users?.active || 0,
+        totalEquipment: dashboardData?.equipment?.total || 0,
+        pendingListings: dashboardData?.equipment?.pendingVerification || 0,
+        totalBookings: dashboardData?.bookings?.total || 0,
+        pendingBookings: dashboardData?.bookings?.pending || 0,
+        completedBookings: dashboardData?.bookings?.completed || 0,
+        totalRevenue: dashboardData?.revenue?.total || 0,
+      });
+
+      setUsers(usersRes.data?.data || []);
+      setEquipment(equipmentRes.data?.data || []);
+      setBookings(bookingsRes.data?.data || []);
     } catch (err) {
       toastError("Failed to load admin data");
     } finally {
@@ -86,29 +120,38 @@ export const AdminDashboard = () => {
       case "active":
         return (
           <Badge variant="success" withDot>
+            <CheckCircle className="w-3 h-3 mr-1" />
             Active
           </Badge>
         );
       case "inactive":
         return (
           <Badge variant="error" withDot>
+            <XCircle className="w-3 h-3 mr-1" />
             Inactive
           </Badge>
         );
       case "pending":
         return (
           <Badge variant="warning" withDot>
+            <Clock className="w-3 h-3 mr-1" />
             Pending
           </Badge>
         );
       case "confirmed":
         return (
           <Badge variant="success" withDot>
+            <CheckCircle className="w-3 h-3 mr-1" />
             Confirmed
           </Badge>
         );
       case "completed":
-        return <Badge variant="default">Completed</Badge>;
+        return (
+          <Badge variant="default">
+            <CheckCircle className="w-3 h-3 mr-1" />
+            Completed
+          </Badge>
+        );
       case "available":
         return (
           <Badge variant="success" withDot>
@@ -190,7 +233,8 @@ export const AdminDashboard = () => {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-neutral-800">
+          <h1 className="text-2xl md:text-3xl font-bold text-neutral-800 flex items-center gap-2">
+            <Settings className="w-6 h-6 text-primary-500" />
             Admin Dashboard
           </h1>
           <p className="text-sm text-neutral-500">
@@ -198,8 +242,13 @@ export const AdminDashboard = () => {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm">
-            📊 Export Report
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-1"
+          >
+            <FileText className="w-4 h-4" />
+            Export Report
           </Button>
         </div>
       </div>
@@ -210,7 +259,7 @@ export const AdminDashboard = () => {
           <button
             key={tab.id}
             className={`
-              px-4 py-2 text-sm font-medium rounded-md transition-all
+              px-4 py-2 text-sm font-medium rounded-md transition-all flex items-center gap-2
               ${
                 activeTab === tab.id
                   ? "bg-primary-500 text-white shadow-sm"
@@ -219,6 +268,7 @@ export const AdminDashboard = () => {
             `}
             onClick={() => setActiveTab(tab.id)}
           >
+            {tab.icon}
             {tab.label}
           </button>
         ))}
@@ -229,54 +279,67 @@ export const AdminDashboard = () => {
         <>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Card className="p-4">
-              <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">
-                Total Users
-              </p>
+              <div className="flex items-center gap-2 mb-1">
+                <Users className="w-4 h-4 text-primary-500" />
+                <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">
+                  Total Users
+                </p>
+              </div>
               <p className="text-2xl font-bold text-primary-500 mt-1">
-                {stats.totalUsers}
+                {stats.totalUsers || 0}
               </p>
               <p className="text-xs text-success-600 mt-1">
-                ↑ {stats.activeUsers} active
+                ↑ {stats.activeUsers || 0} active
               </p>
             </Card>
             <Card className="p-4">
-              <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">
-                Equipment
-              </p>
+              <div className="flex items-center gap-2 mb-1">
+                <Package className="w-4 h-4 text-neutral-700" />
+                <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">
+                  Equipment
+                </p>
+              </div>
               <p className="text-2xl font-bold text-neutral-800 mt-1">
-                {stats.totalEquipment}
+                {stats.totalEquipment || 0}
               </p>
               <p className="text-xs text-warning-600 mt-1">
-                ⏳ {stats.pendingListings} pending verification
+                ⏳ {stats.pendingListings || 0} pending verification
               </p>
             </Card>
             <Card className="p-4">
-              <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">
-                Bookings
-              </p>
+              <div className="flex items-center gap-2 mb-1">
+                <List className="w-4 h-4 text-neutral-700" />
+                <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">
+                  Bookings
+                </p>
+              </div>
               <p className="text-2xl font-bold text-neutral-800 mt-1">
-                {stats.totalBookings}
+                {stats.totalBookings || 0}
               </p>
               <p className="text-xs text-warning-600 mt-1">
-                ⏳ {stats.pendingBookings} pending
+                ⏳ {stats.pendingBookings || 0} pending
               </p>
             </Card>
             <Card className="p-4">
-              <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">
-                Total Revenue
-              </p>
+              <div className="flex items-center gap-2 mb-1">
+                <DollarSign className="w-4 h-4 text-success-600" />
+                <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">
+                  Total Revenue
+                </p>
+              </div>
               <p className="text-2xl font-bold text-success-600 mt-1">
-                {formatCurrency(stats.totalRevenue)}
+                {formatCurrency(stats.totalRevenue || 0)}
               </p>
               <p className="text-xs text-neutral-500 mt-1">
-                {stats.completedBookings} completed
+                {stats.completedBookings || 0} completed
               </p>
             </Card>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <h3 className="font-semibold text-neutral-800 mb-3">
+              <h3 className="font-semibold text-neutral-800 mb-3 flex items-center gap-2">
+                <Users className="w-4 h-4 text-primary-500" />
                 Recent Users
               </h3>
               <div className="space-y-2">
@@ -304,7 +367,8 @@ export const AdminDashboard = () => {
             </div>
 
             <div>
-              <h3 className="font-semibold text-neutral-800 mb-3">
+              <h3 className="font-semibold text-neutral-800 mb-3 flex items-center gap-2">
+                <Clock className="w-4 h-4 text-warning-500" />
                 Pending Listings
               </h3>
               <div className="space-y-2">
@@ -340,10 +404,18 @@ export const AdminDashboard = () => {
       {activeTab === "users" && (
         <Card className="p-4 md:p-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-            <h3 className="font-semibold text-neutral-800">All Users</h3>
+            <h3 className="font-semibold text-neutral-800 flex items-center gap-2">
+              <Users className="w-5 h-5 text-primary-500" />
+              All Users
+            </h3>
             <div className="flex gap-2">
               <Input placeholder="Search users..." className="max-w-xs" />
-              <Button variant="primary" size="sm">
+              <Button
+                variant="primary"
+                size="sm"
+                className="flex items-center gap-1"
+              >
+                <Search className="w-4 h-4" />
                 Filter
               </Button>
             </div>
@@ -435,10 +507,18 @@ export const AdminDashboard = () => {
       {activeTab === "equipment" && (
         <Card className="p-4 md:p-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-            <h3 className="font-semibold text-neutral-800">All Equipment</h3>
+            <h3 className="font-semibold text-neutral-800 flex items-center gap-2">
+              <Package className="w-5 h-5 text-primary-500" />
+              All Equipment
+            </h3>
             <div className="flex gap-2">
               <Input placeholder="Search equipment..." className="max-w-xs" />
-              <Button variant="primary" size="sm">
+              <Button
+                variant="primary"
+                size="sm"
+                className="flex items-center gap-1"
+              >
+                <Search className="w-4 h-4" />
                 Filter
               </Button>
             </div>
@@ -541,10 +621,18 @@ export const AdminDashboard = () => {
       {activeTab === "bookings" && (
         <Card className="p-4 md:p-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-            <h3 className="font-semibold text-neutral-800">All Bookings</h3>
+            <h3 className="font-semibold text-neutral-800 flex items-center gap-2">
+              <List className="w-5 h-5 text-primary-500" />
+              All Bookings
+            </h3>
             <div className="flex gap-2">
               <Input placeholder="Search bookings..." className="max-w-xs" />
-              <Button variant="primary" size="sm">
+              <Button
+                variant="primary"
+                size="sm"
+                className="flex items-center gap-1"
+              >
+                <Search className="w-4 h-4" />
                 Filter
               </Button>
             </div>
@@ -730,7 +818,7 @@ export const AdminDashboard = () => {
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center text-2xl">
-                🚜
+                <Package className="w-6 h-6 text-primary-600" />
               </div>
               <div>
                 <p className="font-medium text-neutral-800">
@@ -763,4 +851,5 @@ export const AdminDashboard = () => {
     </div>
   );
 };
+
 export default AdminDashboard;
