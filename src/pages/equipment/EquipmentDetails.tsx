@@ -362,10 +362,32 @@ export const EquipmentDetails = () => {
                 <span className="font-medium text-neutral-800">2</span>
               </div>
               <div className="border-t border-neutral-200 pt-3 mt-1">
+                {/* Rental breakdown */}
                 <div className="flex items-center justify-between">
                   <span className="font-medium text-neutral-800">
-                    Total ({totalDays || 2} days)
+                    Rental ({totalDays || 2} days ×{" "}
+                    {formatCurrency(equipment?.rentalPricePerDay || 0)})
                   </span>
+                  <span className="font-medium text-neutral-800">
+                    {formatCurrency(
+                      (equipment?.rentalPricePerDay || 0) * (totalDays || 2),
+                    )}
+                  </span>
+                </div>
+                {/* Security Deposit - only show if > 0 */}
+                {(equipment?.securityDeposit || 0) > 0 && (
+                  <div className="flex items-center justify-between mt-1">
+                    <span className="font-medium text-neutral-800">
+                      Security Deposit
+                    </span>
+                    <span className="font-medium text-neutral-800">
+                      {formatCurrency(equipment?.securityDeposit || 0)}
+                    </span>
+                  </div>
+                )}
+                {/* Total */}
+                <div className="flex items-center justify-between pt-2 mt-2 border-t border-neutral-200">
+                  <span className="font-semibold text-neutral-800">Total</span>
                   <span className="text-xl font-bold text-primary-600">
                     {formatCurrency(totalAmount)}
                   </span>
