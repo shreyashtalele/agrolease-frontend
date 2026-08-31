@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { MapPin, User, Eye, Calendar } from "lucide-react";
 import { Card } from "@/components/common/Card";
 import { Badge } from "@/components/common/Badge";
 import { Button } from "@/components/common/Button";
@@ -76,12 +77,14 @@ export const EquipmentCard: React.FC<EquipmentCardProps> = ({ equipment }) => {
           </h3>
         </div>
 
-        <p className="text-sm text-neutral-500 mt-1">
-          📍 {equipment.location.city}, {equipment.location.state}
+        <p className="text-sm text-neutral-500 mt-1 flex items-center gap-1">
+          <MapPin className="w-4 h-4 flex-shrink-0" />
+          {equipment.location.city}, {equipment.location.state}
         </p>
 
-        <p className="text-sm text-neutral-500 mt-1">
-          👤 {equipment.owner.firstName} {equipment.owner.lastName}
+        <p className="text-sm text-neutral-500 mt-1 flex items-center gap-1">
+          <User className="w-4 h-4 flex-shrink-0" />
+          {equipment.owner.firstName} {equipment.owner.lastName}
         </p>
 
         <div className="mt-3 flex items-baseline gap-1">

@@ -1,5 +1,15 @@
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
+import {
+  Truck,
+  MapPin,
+  Shield,
+  Clock,
+  CheckCircle,
+  Zap,
+  User,
+  DollarSign,
+} from "lucide-react";
 import { equipmentApi } from "@/api/equipment";
 import { bookingsApi } from "@/api/bookings";
 import { Button } from "@/components/common/Button";
@@ -191,11 +201,19 @@ export const EquipmentDetails = () => {
             </p>
             <div className="flex flex-wrap gap-2">
               {equipment?.isVerified && (
-                <Badge variant="success" withDot>
+                <Badge
+                  variant="success"
+                  withDot
+                  className="flex items-center gap-1"
+                >
+                  <CheckCircle className="w-3 h-3" />
                   Verified Equipment
                 </Badge>
               )}
-              <Badge variant="info">Insurance Included</Badge>
+              <Badge variant="info" className="flex items-center gap-1">
+                <Shield className="w-3 h-3" />
+                Insurance Included
+              </Badge>
             </div>
           </div>
         );
@@ -220,8 +238,9 @@ export const EquipmentDetails = () => {
         return (
           <div className="space-y-4">
             <div className="bg-success-50 rounded-lg p-4 border border-success-200">
-              <p className="text-sm text-success-700 font-medium">
-                ✅ Available for booking
+              <p className="text-sm text-success-700 font-medium flex items-center gap-1">
+                <CheckCircle className="w-4 h-4" />
+                Available for booking
               </p>
               <p className="text-sm text-success-600 mt-1">
                 Contact owner for specific dates
@@ -288,8 +307,9 @@ export const EquipmentDetails = () => {
                   {equipment?.title}
                 </h1>
                 <div className="flex items-center gap-3 mt-1">
-                  <span className="text-sm text-neutral-500">
-                    📍 {equipment?.location?.city}, {equipment?.location?.state}
+                  <span className="text-sm text-neutral-500 flex items-center gap-1">
+                    <MapPin className="w-4 h-4" />
+                    {equipment?.location?.city}, {equipment?.location?.state}
                   </span>
                 </div>
               </div>
@@ -303,11 +323,15 @@ export const EquipmentDetails = () => {
                 <span className="text-sm text-neutral-500">/ day</span>
               </div>
               <div className="flex flex-wrap gap-4 mt-2 text-sm text-neutral-600">
-                <span>
-                  🔒 {formatCurrency(equipment?.securityDeposit || 0)} security
+                <span className="flex items-center gap-1">
+                  <Shield className="w-4 h-4" />
+                  {formatCurrency(equipment?.securityDeposit || 0)} security
                   deposit
                 </span>
-                <span>🕒 Minimum 2 days</span>
+                <span className="flex items-center gap-1">
+                  <Clock className="w-4 h-4" />
+                  Minimum 2 days
+                </span>
               </div>
             </div>
           </div>
@@ -347,22 +371,25 @@ export const EquipmentDetails = () => {
             <div className="space-y-3">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-neutral-500">Price per day</span>
-                <span className="font-medium text-neutral-800">
+                <span className="font-medium text-neutral-800 flex items-center gap-1">
+                  <DollarSign className="w-4 h-4" />
                   {formatCurrency(equipment?.rentalPricePerDay || 0)}
                 </span>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-neutral-500">Security deposit</span>
-                <span className="font-medium text-neutral-800">
+                <span className="font-medium text-neutral-800 flex items-center gap-1">
+                  <Shield className="w-4 h-4" />
                   {formatCurrency(equipment?.securityDeposit || 0)}
                 </span>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-neutral-500">Min. days</span>
-                <span className="font-medium text-neutral-800">2</span>
+                <span className="font-medium text-neutral-800 flex items-center gap-1">
+                  <Clock className="w-4 h-4" />2
+                </span>
               </div>
               <div className="border-t border-neutral-200 pt-3 mt-1">
-                {/* Rental breakdown */}
                 <div className="flex items-center justify-between">
                   <span className="font-medium text-neutral-800">
                     Rental ({totalDays || 2} days ×{" "}
@@ -374,7 +401,6 @@ export const EquipmentDetails = () => {
                     )}
                   </span>
                 </div>
-                {/* Security Deposit - only show if > 0 */}
                 {(equipment?.securityDeposit || 0) > 0 && (
                   <div className="flex items-center justify-between mt-1">
                     <span className="font-medium text-neutral-800">
@@ -385,7 +411,6 @@ export const EquipmentDetails = () => {
                     </span>
                   </div>
                 )}
-                {/* Total */}
                 <div className="flex items-center justify-between pt-2 mt-2 border-t border-neutral-200">
                   <span className="font-semibold text-neutral-800">Total</span>
                   <span className="text-xl font-bold text-primary-600">
@@ -422,7 +447,10 @@ export const EquipmentDetails = () => {
           </Card>
 
           <Card className="p-4">
-            <h4 className="font-medium text-neutral-800 mb-3">Owner</h4>
+            <h4 className="font-medium text-neutral-800 mb-3 flex items-center gap-1">
+              <User className="w-4 h-4" />
+              Owner
+            </h4>
             <div className="flex items-start gap-3">
               <Avatar
                 size="md"
@@ -432,11 +460,13 @@ export const EquipmentDetails = () => {
                 <p className="font-medium text-neutral-800">
                   {equipment?.owner?.firstName} {equipment?.owner?.lastName}
                 </p>
-                <p className="text-sm text-neutral-500">
+                <p className="text-sm text-neutral-500 flex items-center gap-1">
+                  <MapPin className="w-4 h-4" />
                   {equipment?.location?.city}, {equipment?.location?.state}
                 </p>
-                <p className="text-xs text-success-600 mt-1">
-                  ⚡ Responds within 1 hour
+                <p className="text-xs text-success-600 mt-1 flex items-center gap-1">
+                  <Zap className="w-3 h-3" />
+                  Responds within 1 hour
                 </p>
               </div>
             </div>
@@ -475,11 +505,12 @@ export const EquipmentDetails = () => {
         <div className="space-y-4">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center text-2xl">
-              🚜
+              <Truck className="w-6 h-6 text-primary-600" />
             </div>
             <div>
               <p className="font-medium text-neutral-800">{equipment?.title}</p>
-              <p className="text-sm text-neutral-500">
+              <p className="text-sm text-neutral-500 flex items-center gap-1">
+                <MapPin className="w-4 h-4" />
                 {equipment?.location?.city}, {equipment?.location?.state}
               </p>
             </div>

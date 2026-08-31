@@ -1,12 +1,27 @@
 export interface DashboardStats {
-  totalUsers: number;
-  activeUsers: number;
-  totalEquipment: number;
-  pendingListings: number;
-  totalBookings: number;
-  pendingBookings: number;
-  completedBookings: number;
-  totalRevenue: number;
+  users: {
+    total: number;
+    active: number;
+    providers: number;
+    farmers: number;
+  };
+  equipment: {
+    total: number;
+    available: number;
+    rented: number;
+    pendingVerification: number;
+  };
+  bookings: {
+    total: number;
+    pending: number;
+    confirmed: number;
+    completed: number;
+    cancelled: number;
+  };
+  revenue: {
+    total: number;
+    thisMonth: number;
+  };
 }
 
 export interface UserFilters {
@@ -28,6 +43,7 @@ export interface AdminUser {
   isActive: boolean;
   bookings: number;
   joined: string;
+  createdAt: string;
 }
 
 export interface UpdateUserStatusRequest {

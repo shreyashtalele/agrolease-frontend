@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Bell, LogOut } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { notificationsApi } from "@/api/notifications";
 import { Avatar } from "@/components/common/Avatar";
@@ -13,7 +14,7 @@ export const Header: React.FC = () => {
   useEffect(() => {
     if (isAuthenticated) {
       loadUnreadCount();
-      const interval = setInterval(loadUnreadCount, 30000); // Poll every 30s
+      const interval = setInterval(loadUnreadCount, 30000);
       return () => clearInterval(interval);
     }
   }, [isAuthenticated]);
@@ -23,7 +24,7 @@ export const Header: React.FC = () => {
       const response = await notificationsApi.getUnreadCount();
       setUnreadCount(response.data.count);
     } catch (error) {
-      // Silent fail - don't show toast for background polling
+      // Silent fail
     }
   };
 
@@ -49,30 +50,41 @@ export const Header: React.FC = () => {
               {/* Notification Bell */}
               <Link
                 to="/notifications"
-                className="text-neutral-400 hover:text-neutral-600 transition-colors relative"
+                className="text-neutral-500 hover:text-primary-500 transition-colors duration-200 relative group"
+                aria-label="Notifications"
               >
-                🔔
+                <Bell className="w-6 h-6 transition-transform duration-200 group-hover:scale-110" />
                 {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-error-500 text-white text-[10px] rounded-full flex items-center justify-center font-medium">
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-error-500 text-white text-[10px] rounded-full flex items-center justify-center font-medium animate-pulse">
                     {unreadCount > 99 ? "99+" : unreadCount}
                   </span>
                 )}
+                <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-neutral-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                  Notifications
+                </span>
               </Link>
 
               {/* User Avatar */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 group cursor-pointer">
                 <Avatar
                   size="sm"
                   fallback={`${user.firstName?.[0] || ""}${user.lastName?.[0] || ""}`}
+                  className="group-hover:ring-2 group-hover:ring-primary-300 transition-all duration-200"
                 />
-                <span className="text-sm font-medium text-neutral-700 hidden sm:block">
+                <span className="text-sm font-medium text-neutral-700 hidden sm:block group-hover:text-primary-600 transition-colors duration-200">
                   {user.firstName}
                 </span>
               </div>
 
               {/* Logout */}
-              <Button variant="ghost" size="sm" onClick={handleLogout}>
-                Logout
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleLogout}
+                className="flex items-center gap-1"
+              >
+                <LogOut className="w-4 h-4" />
+                <span className="hidden sm:inline">Logout</span>
               </Button>
             </>
           ) : (

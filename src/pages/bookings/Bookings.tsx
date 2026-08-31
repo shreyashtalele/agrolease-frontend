@@ -1,5 +1,17 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import {
+  Truck,
+  MapPin,
+  User,
+  Calendar,
+  DollarSign,
+  CheckCircle,
+  Clock,
+  XCircle,
+  List,
+  AlertCircle,
+} from "lucide-react";
 import { bookingsApi } from "@/api/bookings";
 import { Button } from "@/components/common/Button";
 import { Card } from "@/components/common/Card";
@@ -67,26 +79,35 @@ export const Bookings = () => {
       case "confirmed":
         return (
           <Badge variant="success" withDot>
+            <CheckCircle className="w-3 h-3 mr-1" />
             Confirmed
           </Badge>
         );
       case "pending":
         return (
           <Badge variant="warning" withDot>
+            <Clock className="w-3 h-3 mr-1" />
             Pending
           </Badge>
         );
       case "active":
         return (
           <Badge variant="info" withDot>
+            <AlertCircle className="w-3 h-3 mr-1" />
             Active
           </Badge>
         );
       case "completed":
-        return <Badge variant="default">Completed</Badge>;
+        return (
+          <Badge variant="default">
+            <CheckCircle className="w-3 h-3 mr-1" />
+            Completed
+          </Badge>
+        );
       case "cancelled":
         return (
           <Badge variant="error" withDot>
+            <XCircle className="w-3 h-3 mr-1" />
             Cancelled
           </Badge>
         );
@@ -166,7 +187,8 @@ export const Bookings = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-neutral-800">
+          <h1 className="text-2xl md:text-3xl font-bold text-neutral-800 flex items-center gap-2">
+            <List className="w-6 h-6 text-primary-500" />
             My Bookings
           </h1>
           <p className="text-sm text-neutral-500">
@@ -174,7 +196,10 @@ export const Bookings = () => {
           </p>
         </div>
         <Link to="/equipment">
-          <Button variant="primary">Browse More Equipment</Button>
+          <Button variant="primary" className="flex items-center gap-1">
+            <Truck className="w-4 h-4" />
+            Browse More Equipment
+          </Button>
         </Link>
       </div>
 
@@ -184,7 +209,7 @@ export const Bookings = () => {
           <button
             key={tab.id}
             className={`
-              px-4 py-2 text-sm font-medium rounded-md transition-all
+              px-4 py-2 text-sm font-medium rounded-md transition-all flex items-center gap-1
               ${
                 activeTab === tab.id
                   ? "bg-primary-500 text-white shadow-sm"
@@ -235,13 +260,10 @@ export const Bookings = () => {
       ) : (
         <div className="space-y-4">
           {filteredBookings.map((booking) => {
-            // ✅ FIX: Use correct field names - "equipment", not "equipmentId"
             const equipment = booking.equipment;
             const equipmentTitle = equipment?.title || "Equipment";
             const equipmentCity = equipment?.location?.city || "N/A";
             const equipmentState = equipment?.location?.state || "N/A";
-
-            // ✅ FIX: Use correct field names - "renter", not "renterId"
             const renter = booking.renter;
             const owner = booking.owner;
 
@@ -256,14 +278,15 @@ export const Bookings = () => {
                   {/* Left: Equipment Info */}
                   <div className="flex items-start gap-4">
                     <div className="w-16 h-16 bg-neutral-100 rounded-lg flex items-center justify-center text-3xl flex-shrink-0">
-                      🚜
+                      <Truck className="w-8 h-8 text-neutral-400" />
                     </div>
                     <div>
                       <h3 className="font-semibold text-neutral-800">
                         {equipmentTitle}
                       </h3>
-                      <p className="text-sm text-neutral-500">
-                        📍 {equipmentCity}, {equipmentState}
+                      <p className="text-sm text-neutral-500 flex items-center gap-1">
+                        <MapPin className="w-4 h-4" />
+                        {equipmentCity}, {equipmentState}
                       </p>
                       <div className="flex flex-wrap items-center gap-2 mt-2">
                         {getStatusBadge(booking.status)}
@@ -277,13 +300,15 @@ export const Bookings = () => {
                   {/* Right: Details & Actions */}
                   <div className="flex flex-col sm:flex-row sm:items-end gap-4 sm:gap-6">
                     <div className="text-right">
-                      <div className="text-sm text-neutral-500">
+                      <div className="text-sm text-neutral-500 flex items-center gap-1 justify-end">
+                        <Calendar className="w-4 h-4" />
                         {formatDateRange(
                           booking.bookingDateStart,
                           booking.bookingDateEnd,
                         )}
                       </div>
-                      <div className="text-sm text-neutral-500">
+                      <div className="text-sm text-neutral-500 flex items-center gap-1 justify-end">
+                        <DollarSign className="w-4 h-4" />
                         {formatCurrency(booking.totalPrice)}
                       </div>
                       <div className="text-xs text-neutral-400 mt-1">
@@ -393,7 +418,8 @@ export const Bookings = () => {
                       }
                     />
                     <div>
-                      <p className="font-medium text-neutral-700">
+                      <p className="font-medium text-neutral-700 flex items-center gap-1">
+                        <User className="w-4 h-4" />
                         {isProvider
                           ? `${renter?.firstName || "User"} ${renter?.lastName || ""}`
                           : `${owner?.firstName || "Owner"} ${owner?.lastName || ""}`}

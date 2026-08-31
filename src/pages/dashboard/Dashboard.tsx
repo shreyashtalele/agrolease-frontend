@@ -1,5 +1,19 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import {
+  Calendar,
+  List,
+  Package,
+  Settings,
+  DollarSign,
+  BarChart3,
+  CheckCircle,
+  Clock,
+  XCircle,
+  User,
+  Bell,
+  PlusCircle,
+} from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { bookingsApi } from "@/api/bookings";
 import { notificationsApi } from "@/api/notifications";
@@ -39,7 +53,6 @@ export const Dashboard = () => {
   const loadDashboardData = async () => {
     setLoading(true);
     try {
-      // Load bookings based on role
       const bookingsRes = await bookingsApi.list({
         type: isProvider ? "owner" : "renter",
         limit: 5,
@@ -47,7 +60,6 @@ export const Dashboard = () => {
       const bookings = bookingsRes.data.data || [];
       setRecentBookings(bookings);
 
-      // Calculate stats
       const active = bookings.filter(
         (b: any) => b.status === "confirmed" || b.status === "active",
       );
@@ -66,7 +78,6 @@ export const Dashboard = () => {
         totalSpent: total,
       }));
 
-      // If provider, fetch listings for analytics
       if (isProvider) {
         try {
           const listingsRes = await equipmentApi.getMyListings();
@@ -87,7 +98,6 @@ export const Dashboard = () => {
         }
       }
 
-      // Load notifications
       const notifRes = await notificationsApi.list({ limit: 3 });
       const notifData = notifRes.data.data || [];
       setNotifications(notifData);
@@ -103,26 +113,35 @@ export const Dashboard = () => {
       case "confirmed":
         return (
           <Badge variant="success" withDot>
+            <CheckCircle className="w-3 h-3 mr-1" />
             Confirmed
           </Badge>
         );
       case "pending":
         return (
           <Badge variant="warning" withDot>
+            <Clock className="w-3 h-3 mr-1" />
             Pending
           </Badge>
         );
       case "active":
         return (
           <Badge variant="info" withDot>
+            <BarChart3 className="w-3 h-3 mr-1" />
             Active
           </Badge>
         );
       case "completed":
-        return <Badge variant="default">Completed</Badge>;
+        return (
+          <Badge variant="default">
+            <CheckCircle className="w-3 h-3 mr-1" />
+            Completed
+          </Badge>
+        );
       case "cancelled":
         return (
           <Badge variant="error" withDot>
+            <XCircle className="w-3 h-3 mr-1" />
             Cancelled
           </Badge>
         );
@@ -144,14 +163,15 @@ export const Dashboard = () => {
       {/* Welcome Section */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-neutral-800">
+          <h1 className="text-2xl md:text-3xl font-bold text-neutral-800 flex items-center gap-2">
             Good{" "}
             {new Date().getHours() < 12
               ? "Morning"
               : new Date().getHours() < 18
                 ? "Afternoon"
                 : "Evening"}
-            , {user?.firstName || "User"} 👋
+            , {user?.firstName || "User"}
+            <User className="w-6 h-6 text-primary-500" />
           </h1>
           <p className="text-sm text-neutral-500">
             {isProvider
@@ -160,69 +180,93 @@ export const Dashboard = () => {
           </p>
         </div>
         <Link to="/equipment">
-          <Button variant="primary">Browse Equipment</Button>
+          <Button variant="primary" className="flex items-center gap-1">
+            <PlusCircle className="w-4 h-4" />
+            Browse Equipment
+          </Button>
         </Link>
       </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card className="p-4">
-          <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">
-            {isProvider ? "Active Rentals" : "Active Bookings"}
-          </p>
+          <div className="flex items-center gap-2 mb-1">
+            <Calendar className="w-4 h-4 text-primary-500" />
+            <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">
+              {isProvider ? "Active Rentals" : "Active Bookings"}
+            </p>
+          </div>
           <p className="text-2xl font-bold text-primary-500 mt-1">
             {stats.activeBookings}
           </p>
         </Card>
         <Card className="p-4">
-          <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">
-            {isProvider ? "Pending Requests" : "Pending"}
-          </p>
+          <div className="flex items-center gap-2 mb-1">
+            <Clock className="w-4 h-4 text-warning-500" />
+            <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">
+              {isProvider ? "Pending Requests" : "Pending"}
+            </p>
+          </div>
           <p className="text-2xl font-bold text-warning-500 mt-1">
             {stats.pending}
           </p>
         </Card>
         <Card className="p-4">
-          <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">
-            {isProvider ? "Completed Rentals" : "Completed"}
-          </p>
+          <div className="flex items-center gap-2 mb-1">
+            <CheckCircle className="w-4 h-4 text-success-500" />
+            <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">
+              {isProvider ? "Completed Rentals" : "Completed"}
+            </p>
+          </div>
           <p className="text-2xl font-bold text-success-500 mt-1">
             {stats.completed}
           </p>
         </Card>
         <Card className="p-4">
-          <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">
-            {isProvider ? "Total Revenue" : "Total Spent"}
-          </p>
+          <div className="flex items-center gap-2 mb-1">
+            <DollarSign className="w-4 h-4 text-neutral-700" />
+            <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">
+              {isProvider ? "Total Revenue" : "Total Spent"}
+            </p>
+          </div>
           <p className="text-2xl font-bold text-neutral-800 mt-1">
             {formatCurrency(isProvider ? stats.totalRevenue : stats.totalSpent)}
           </p>
         </Card>
       </div>
 
-      {/* Provider Analytics Cards (if provider) */}
+      {/* Provider Analytics Cards */}
       {isProvider && (
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           <Card className="p-4 bg-primary-50 border-primary-200">
-            <p className="text-xs font-medium uppercase tracking-wider text-primary-600">
-              Total Listings
-            </p>
+            <div className="flex items-center gap-2 mb-1">
+              <Package className="w-4 h-4 text-primary-600" />
+              <p className="text-xs font-medium uppercase tracking-wider text-primary-600">
+                Total Listings
+              </p>
+            </div>
             <p className="text-3xl font-bold text-primary-700 mt-1">
               {stats.totalListings}
             </p>
           </Card>
           <Card className="p-4 bg-success-50 border-success-200">
-            <p className="text-xs font-medium uppercase tracking-wider text-success-600">
-              Completed Rentals
-            </p>
+            <div className="flex items-center gap-2 mb-1">
+              <CheckCircle className="w-4 h-4 text-success-600" />
+              <p className="text-xs font-medium uppercase tracking-wider text-success-600">
+                Completed Rentals
+              </p>
+            </div>
             <p className="text-3xl font-bold text-success-700 mt-1">
               {stats.completed}
             </p>
           </Card>
           <Card className="p-4 bg-warning-50 border-warning-200">
-            <p className="text-xs font-medium uppercase tracking-wider text-warning-600">
-              Pending Requests
-            </p>
+            <div className="flex items-center gap-2 mb-1">
+              <Clock className="w-4 h-4 text-warning-600" />
+              <p className="text-xs font-medium uppercase tracking-wider text-warning-600">
+                Pending Requests
+              </p>
+            </div>
             <p className="text-3xl font-bold text-warning-700 mt-1">
               {stats.pending}
             </p>
@@ -232,10 +276,10 @@ export const Dashboard = () => {
 
       {/* Two Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column: Recent Bookings */}
         <div className="lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-neutral-800">
+            <h2 className="text-lg font-semibold text-neutral-800 flex items-center gap-2">
+              <List className="w-5 h-5 text-primary-500" />
               {isProvider ? "Recent Rental Requests" : "Recent Bookings"}
             </h2>
             <Link
@@ -269,18 +313,19 @@ export const Dashboard = () => {
                       <h4 className="font-medium text-neutral-800">
                         {booking.equipment?.title || "Equipment"}
                       </h4>
-                      {/* ✅ Show renter name for providers */}
                       {isProvider && booking.renter && (
-                        <p className="text-sm text-neutral-500">
-                          👤 {booking.renter.firstName}{" "}
-                          {booking.renter.lastName}
+                        <p className="text-sm text-neutral-500 flex items-center gap-1">
+                          <User className="w-4 h-4" />
+                          {booking.renter.firstName} {booking.renter.lastName}
                         </p>
                       )}
-                      <p className="text-sm text-neutral-500">
+                      <p className="text-sm text-neutral-500 flex items-center gap-1">
+                        <Calendar className="w-4 h-4" />
                         {formatDate(booking.bookingDateStart)} -{" "}
                         {formatDate(booking.bookingDateEnd)}
                       </p>
-                      <p className="text-sm text-neutral-500">
+                      <p className="text-sm text-neutral-500 flex items-center gap-1">
+                        <DollarSign className="w-4 h-4" />
                         {formatCurrency(booking.totalPrice)}
                       </p>
                     </div>
@@ -292,7 +337,6 @@ export const Dashboard = () => {
           )}
         </div>
 
-        {/* Right Column: Quick Actions & Notifications */}
         <div className="space-y-6">
           {/* Quick Actions */}
           <div>
@@ -302,26 +346,50 @@ export const Dashboard = () => {
             <Card className="p-4 bg-primary-50 border-primary-200">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <Link to="/equipment" className="w-full">
-                  <Button variant="primary" size="sm" fullWidth>
-                    📅 New Booking
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    fullWidth
+                    className="flex items-center gap-1"
+                  >
+                    <PlusCircle className="w-4 h-4" />
+                    New Booking
                   </Button>
                 </Link>
                 <Link to="/bookings" className="w-full">
-                  <Button variant="outline" size="sm" fullWidth>
-                    📋 My Bookings
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    fullWidth
+                    className="flex items-center gap-1"
+                  >
+                    <List className="w-4 h-4" />
+                    My Bookings
                   </Button>
                 </Link>
                 {isProvider && (
                   <Link to="/listings" className="w-full">
-                    <Button variant="outline" size="sm" fullWidth>
-                      📦 My Listings
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      fullWidth
+                      className="flex items-center gap-1"
+                    >
+                      <Package className="w-4 h-4" />
+                      My Listings
                     </Button>
                   </Link>
                 )}
                 {isAdmin && (
                   <Link to="/admin" className="w-full">
-                    <Button variant="danger" size="sm" fullWidth>
-                      ⚙️ Admin Dashboard
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      fullWidth
+                      className="flex items-center gap-1"
+                    >
+                      <Settings className="w-4 h-4" />
+                      Admin Dashboard
                     </Button>
                   </Link>
                 )}
@@ -332,7 +400,8 @@ export const Dashboard = () => {
           {/* Notifications */}
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-neutral-800">
+              <h2 className="text-lg font-semibold text-neutral-800 flex items-center gap-2">
+                <Bell className="w-5 h-5 text-primary-500" />
                 Notifications
               </h2>
               <Link
