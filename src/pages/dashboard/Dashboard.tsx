@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useAuthStore } from "@/store/authStore";
 import { bookingsApi } from "@/api/bookings";
 import { notificationsApi } from "@/api/notifications";
+import { equipmentApi } from "@/api/equipment";
 import { Button } from "@/components/common/Button";
 import { Card } from "@/components/common/Card";
 import { Badge } from "@/components/common/Badge";
@@ -21,10 +22,15 @@ export const Dashboard = () => {
     pending: 0,
     completed: 0,
     totalSpent: 0,
+    totalListings: 0,
+    totalRevenue: 0,
+    averageRating: 0,
   });
   const [recentBookings, setRecentBookings] = useState<any[]>([]);
   const [notifications, setNotifications] = useState<any[]>([]);
-  const [unreadCount, setUnreadCount] = useState(0);
+
+  const isProvider = user?.role === "provider";
+  const isAdmin = user?.role === "admin";
 
   useEffect(() => {
     loadDashboardData();
@@ -33,8 +39,11 @@ export const Dashboard = () => {
   const loadDashboardData = async () => {
     setLoading(true);
     try {
-      // Load bookings
-      const bookingsRes = await bookingsApi.list({ type: "renter", limit: 5 });
+      // Load bookings based on role
+      const bookingsRes = await bookingsApi.list({
+        type: isProvider ? "owner" : "renter",
+        limit: 5,
+      });
       const bookings = bookingsRes.data.data || [];
       setRecentBookings(bookings);
 
@@ -49,18 +58,40 @@ export const Dashboard = () => {
         0,
       );
 
-      setStats({
+      setStats((prev) => ({
+        ...prev,
         activeBookings: active.length,
         pending: pending.length,
         completed: completed.length,
         totalSpent: total,
-      });
+      }));
 
-      // Load notifications list (not just count)
+      // If provider, fetch listings for analytics
+      if (isProvider) {
+        try {
+          const listingsRes = await equipmentApi.getMyListings();
+          // ✅ FIX: Access data.data, not data directly
+          const listings = listingsRes.data.data || [];
+          const totalListings = listings.length;
+          const totalRevenue = completed.reduce(
+            (sum, b) => sum + (b.totalPrice || 0),
+            0,
+          );
+
+          setStats((prev) => ({
+            ...prev,
+            totalListings,
+            totalRevenue,
+          }));
+        } catch (err) {
+          console.error("Failed to load provider stats:", err);
+        }
+      }
+
+      // Load notifications
       const notifRes = await notificationsApi.list({ limit: 3 });
       const notifData = notifRes.data.data || [];
       setNotifications(notifData);
-      setUnreadCount(notifData.filter((n: any) => !n.isRead).length);
     } catch (error) {
       console.error("Failed to load dashboard data:", error);
     } finally {
@@ -109,9 +140,6 @@ export const Dashboard = () => {
     );
   }
 
-  const isProvider = user?.role === "provider";
-  const isAdmin = user?.role === "admin";
-
   return (
     <div className="space-y-6">
       {/* Welcome Section */}
@@ -127,7 +155,9 @@ export const Dashboard = () => {
             , {user?.firstName || "User"} 👋
           </h1>
           <p className="text-sm text-neutral-500">
-            Here's what's happening with your equipment
+            {isProvider
+              ? "Here's your equipment business overview"
+              : "Here's what's happening with your equipment"}
           </p>
         </div>
         <Link to="/equipment">
@@ -139,7 +169,7 @@ export const Dashboard = () => {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card className="p-4">
           <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">
-            Active Bookings
+            {isProvider ? "Active Rentals" : "Active Bookings"}
           </p>
           <p className="text-2xl font-bold text-primary-500 mt-1">
             {stats.activeBookings}
@@ -147,7 +177,7 @@ export const Dashboard = () => {
         </Card>
         <Card className="p-4">
           <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">
-            Pending
+            {isProvider ? "Pending Requests" : "Pending"}
           </p>
           <p className="text-2xl font-bold text-warning-500 mt-1">
             {stats.pending}
@@ -155,7 +185,7 @@ export const Dashboard = () => {
         </Card>
         <Card className="p-4">
           <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">
-            Completed
+            {isProvider ? "Completed Rentals" : "Completed"}
           </p>
           <p className="text-2xl font-bold text-success-500 mt-1">
             {stats.completed}
@@ -163,13 +193,43 @@ export const Dashboard = () => {
         </Card>
         <Card className="p-4">
           <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">
-            Total Spent
+            {isProvider ? "Total Revenue" : "Total Spent"}
           </p>
           <p className="text-2xl font-bold text-neutral-800 mt-1">
-            {formatCurrency(stats.totalSpent)}
+            {formatCurrency(isProvider ? stats.totalRevenue : stats.totalSpent)}
           </p>
         </Card>
       </div>
+
+      {/* Provider Analytics Cards (if provider) */}
+      {isProvider && (
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <Card className="p-4 bg-primary-50 border-primary-200">
+            <p className="text-xs font-medium uppercase tracking-wider text-primary-600">
+              Total Listings
+            </p>
+            <p className="text-3xl font-bold text-primary-700 mt-1">
+              {stats.totalListings}
+            </p>
+          </Card>
+          <Card className="p-4 bg-success-50 border-success-200">
+            <p className="text-xs font-medium uppercase tracking-wider text-success-600">
+              Completed Rentals
+            </p>
+            <p className="text-3xl font-bold text-success-700 mt-1">
+              {stats.completed}
+            </p>
+          </Card>
+          <Card className="p-4 bg-warning-50 border-warning-200">
+            <p className="text-xs font-medium uppercase tracking-wider text-warning-600">
+              Pending Requests
+            </p>
+            <p className="text-3xl font-bold text-warning-700 mt-1">
+              {stats.pending}
+            </p>
+          </Card>
+        </div>
+      )}
 
       {/* Two Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -177,7 +237,7 @@ export const Dashboard = () => {
         <div className="lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-neutral-800">
-              Recent Bookings
+              {isProvider ? "Recent Rental Requests" : "Recent Bookings"}
             </h2>
             <Link
               to="/bookings"
@@ -189,10 +249,12 @@ export const Dashboard = () => {
 
           {recentBookings.length === 0 ? (
             <Card className="p-8 text-center">
-              <p className="text-neutral-500">No bookings yet</p>
+              <p className="text-neutral-500">
+                {isProvider ? "No rental requests yet" : "No bookings yet"}
+              </p>
               <Link to="/equipment">
                 <Button variant="primary" className="mt-4">
-                  Browse Equipment
+                  {isProvider ? "Manage Listings" : "Browse Equipment"}
                 </Button>
               </Link>
             </Card>
@@ -226,7 +288,7 @@ export const Dashboard = () => {
 
         {/* Right Column: Quick Actions & Notifications */}
         <div className="space-y-6">
-          {/* Quick Actions - NOW FIRST */}
+          {/* Quick Actions */}
           <div>
             <h2 className="text-lg font-semibold text-neutral-800 mb-4">
               Quick Actions
@@ -261,7 +323,7 @@ export const Dashboard = () => {
             </Card>
           </div>
 
-          {/* Notifications - NOW SECOND */}
+          {/* Notifications */}
           <div>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-neutral-800">
