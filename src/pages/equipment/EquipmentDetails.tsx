@@ -13,6 +13,8 @@ import { useToast } from "@/hooks/useToast";
 import { useAuthStore } from "@/store/authStore";
 import { formatCurrency } from "@/utils/formatters";
 import { useRazorpay } from "@/hooks/useRazorpay";
+import { BackButton } from "@/components/shared/BackButton";
+import { Breadcrumbs } from "@/components/shared/Breadcrumbs";
 
 export const EquipmentDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -53,7 +55,6 @@ export const EquipmentDetails = () => {
     }
   };
 
-  // Helper to calculate number of days between two dates
   const calculateDays = (startDate: string, endDate: string): number => {
     if (!startDate || !endDate) return 0;
     const start = new Date(startDate);
@@ -63,7 +64,6 @@ export const EquipmentDetails = () => {
     return diffDays > 0 ? diffDays : 0;
   };
 
-  // Calculate total days and amount dynamically
   const totalDays = calculateDays(bookingDates.startDate, bookingDates.endDate);
   const totalAmount =
     totalDays > 0
@@ -83,14 +83,12 @@ export const EquipmentDetails = () => {
       return;
     }
 
-    // ✅ Validate: end date must be after start date
     const days = calculateDays(bookingDates.startDate, bookingDates.endDate);
     if (days === 0) {
       toastError("End date must be after start date");
       return;
     }
 
-    // ✅ CHECK: Prevent provider from booking their own equipment
     if (equipment?.owner?._id === user?.id) {
       toastError("You cannot book your own equipment");
       return;
@@ -116,7 +114,6 @@ export const EquipmentDetails = () => {
 
       setShowBookingModal(false);
 
-      // ✅ Use the calculated total amount
       await initializePayment({
         orderId: booking._id,
         amount: totalAmount,
@@ -244,20 +241,14 @@ export const EquipmentDetails = () => {
     }
   };
 
-  // Check if current user is the owner
   const isOwner = equipment?.owner?._id === user?.id;
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-2 text-sm text-neutral-500">
-        <Link
-          to="/equipment"
-          className="hover:text-primary-500 transition-colors"
-        >
-          Equipment
-        </Link>
-        <span>›</span>
-        <span className="text-neutral-700 font-medium">{equipment?.title}</span>
+      {/* Navigation: Breadcrumbs + Back Button */}
+      <div className="flex items-center justify-between">
+        <Breadcrumbs />
+        <BackButton label="Back to Equipment" fallbackPath="/equipment" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -367,7 +358,7 @@ export const EquipmentDetails = () => {
                     Total ({totalDays || 2} days)
                   </span>
                   <span className="text-xl font-bold text-primary-600">
-                    {formatCurrency(totalAmount)}
+                    {formatCurrency(totalAmount || 0)}
                   </span>
                 </div>
               </div>
@@ -537,4 +528,5 @@ export const EquipmentDetails = () => {
     </div>
   );
 };
+
 export default EquipmentDetails;

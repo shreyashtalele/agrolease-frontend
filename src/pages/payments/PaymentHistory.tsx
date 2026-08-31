@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { paymentsApi } from "@/api/payments";
+import { Button } from "@/components/common/Button";
 import { Card } from "@/components/common/Card";
 import { Badge } from "@/components/common/Badge";
 import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { useToast } from "@/hooks/useToast";
 import { formatCurrency, formatDateTime } from "@/utils/formatters";
+import { BackButton } from "@/components/shared/BackButton";
 
 export const PaymentHistory = () => {
   const { error: toastError } = useToast();
@@ -19,7 +22,8 @@ export const PaymentHistory = () => {
     setLoading(true);
     try {
       const response = await paymentsApi.getHistory();
-      setPayments(response.data || []);
+      const paymentsData = (response.data as any)?.data || response.data || [];
+      setPayments(paymentsData);
     } catch (err) {
       toastError("Failed to load payment history");
     } finally {
@@ -30,6 +34,7 @@ export const PaymentHistory = () => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "success":
+      case "completed":
         return (
           <Badge variant="success" withDot>
             Success
@@ -64,6 +69,11 @@ export const PaymentHistory = () => {
 
   return (
     <div className="space-y-6">
+      {/* Navigation */}
+      <div className="flex items-center justify-between">
+        <BackButton label="Back to Dashboard" fallbackPath="/dashboard" />
+      </div>
+
       <div>
         <h1 className="text-2xl md:text-3xl font-bold text-neutral-800">
           Payment History
@@ -95,10 +105,13 @@ export const PaymentHistory = () => {
                     <div>
                       <p className="font-medium text-neutral-800">
                         Payment for Booking #
-                        {payment.bookingId?.slice(-6) || "N/A"}
+                        {payment.booking?._id?.slice(-6) ||
+                          payment.bookingId?.slice(-6) ||
+                          "N/A"}
                       </p>
                       <p className="text-sm text-neutral-500">
-                        Order ID: {payment.orderId}
+                        Order ID:{" "}
+                        {payment.razorpayOrderId || payment.orderId || "N/A"}
                       </p>
                     </div>
                   </div>
@@ -106,7 +119,7 @@ export const PaymentHistory = () => {
                 <div className="flex flex-wrap items-center gap-4">
                   <div className="text-right">
                     <p className="text-lg font-bold text-primary-600">
-                      {formatCurrency(payment.amount)}
+                      {formatCurrency(payment.amount || 0)}
                     </p>
                     <p className="text-xs text-neutral-400">
                       {formatDateTime(payment.createdAt)}
@@ -114,6 +127,13 @@ export const PaymentHistory = () => {
                   </div>
                   {getStatusBadge(payment.status)}
                 </div>
+                <Link
+                  to={`/payments/${payment.razorpayOrderId || payment._id}`}
+                >
+                  <Button variant="outline" size="sm">
+                    View Details
+                  </Button>
+                </Link>
               </div>
             </Card>
           ))}
@@ -122,4 +142,5 @@ export const PaymentHistory = () => {
     </div>
   );
 };
+
 export default PaymentHistory;

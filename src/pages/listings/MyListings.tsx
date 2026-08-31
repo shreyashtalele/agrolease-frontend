@@ -1,5 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import {
+  Truck,
+  MapPin,
+  Eye,
+  Calendar,
+  Package,
+  Plus,
+  Pencil,
+  Trash2,
+  Clock,
+} from "lucide-react";
 import { equipmentApi } from "@/api/equipment";
 import { Button } from "@/components/common/Button";
 import { Card } from "@/components/common/Card";
@@ -10,6 +21,7 @@ import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { useToast } from "@/hooks/useToast";
 import { formatCurrency } from "@/utils/formatters";
 import type { Equipment } from "@/types";
+import { BackButton } from "@/components/shared/BackButton";
 
 interface Listing extends Equipment {
   views?: number;
@@ -71,7 +83,6 @@ export const MyListings = () => {
     setLoading(true);
     try {
       const response = await equipmentApi.getMyListings();
-      // Get the array from the paginated response
       const listingsData = response.data?.data || [];
       const listingsWithUI = listingsData.map((item: Equipment) => ({
         ...item,
@@ -85,6 +96,7 @@ export const MyListings = () => {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     loadListings();
   }, []);
@@ -245,15 +257,9 @@ export const MyListings = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-neutral-800">
-            My Listings
-          </h1>
-          <p className="text-sm text-neutral-500">
-            Manage your equipment listings ({listings.length} total)
-          </p>
-        </div>
+      {/* Navigation: Back Button */}
+      <div className="flex items-center justify-between">
+        <BackButton label="Back to Dashboard" fallbackPath="/dashboard" />
         <Button
           variant="primary"
           onClick={() => {
@@ -277,40 +283,64 @@ export const MyListings = () => {
             });
             setShowAddModal(true);
           }}
+          className="flex items-center gap-1"
         >
-          + Add New Listing
+          <Plus className="w-4 h-4" />
+          Add New Listing
         </Button>
+      </div>
+
+      <div>
+        <h1 className="text-2xl md:text-3xl font-bold text-neutral-800 flex items-center gap-2">
+          <Package className="w-6 h-6 text-primary-500" />
+          My Listings
+        </h1>
+        <p className="text-sm text-neutral-500">
+          Manage your equipment listings ({listings.length} total)
+        </p>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card className="p-4">
-          <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">
-            Total
-          </p>
+          <div className="flex items-center gap-2 mb-1">
+            <Package className="w-4 h-4 text-primary-500" />
+            <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">
+              Total
+            </p>
+          </div>
           <p className="text-2xl font-bold text-primary-500 mt-1">
             {listings.length}
           </p>
         </Card>
         <Card className="p-4">
-          <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">
-            Available
-          </p>
+          <div className="flex items-center gap-2 mb-1">
+            <Truck className="w-4 h-4 text-success-500" />
+            <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">
+              Available
+            </p>
+          </div>
           <p className="text-2xl font-bold text-success-500 mt-1">
             {listings.filter((l) => l.status === "available").length}
           </p>
         </Card>
         <Card className="p-4">
-          <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">
-            Booked
-          </p>
+          <div className="flex items-center gap-2 mb-1">
+            <Calendar className="w-4 h-4 text-error-500" />
+            <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">
+              Booked
+            </p>
+          </div>
           <p className="text-2xl font-bold text-error-500 mt-1">
             {listings.filter((l) => l.status === "booked").length}
           </p>
         </Card>
         <Card className="p-4">
-          <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">
-            Pending
-          </p>
+          <div className="flex items-center gap-2 mb-1">
+            <Clock className="w-4 h-4 text-warning-500" />
+            <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">
+              Pending
+            </p>
+          </div>
           <p className="text-2xl font-bold text-warning-500 mt-1">
             {listings.filter((l) => l.status === "pending").length}
           </p>
@@ -396,11 +426,13 @@ export const MyListings = () => {
           {filteredListings.map((listing) => (
             <Card
               key={listing._id}
-              className={`p-4 hover:shadow-md transition-shadow ${getStatusColor(listing.status)}`}
+              className={`p-4 hover:shadow-md transition-shadow ${getStatusColor(
+                listing.status,
+              )}`}
             >
               <div className="flex items-start gap-4">
                 <div className="w-16 h-16 bg-neutral-100 rounded-lg flex items-center justify-center text-3xl flex-shrink-0">
-                  🚜
+                  <Truck className="w-8 h-8 text-neutral-400" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
@@ -409,16 +441,27 @@ export const MyListings = () => {
                     </h3>
                     {getStatusBadge(listing.status)}
                   </div>
-                  <p className="text-sm text-neutral-500">
-                    📍 {listing.location.city}, {listing.location.state}
+                  <p className="text-sm text-neutral-500 flex items-center gap-1">
+                    <MapPin className="w-4 h-4" />
+                    {listing.location.city}, {listing.location.state}
                   </p>
                   <p className="text-sm font-medium text-primary-600 mt-1">
                     {formatCurrency(listing.rentalPricePerDay)} / day
                   </p>
                   <div className="flex flex-wrap items-center gap-3 mt-2 text-xs text-neutral-500">
-                    <span>👁️ {listing.views || 0} views</span>
+                    <span className="flex items-center gap-1 group cursor-default">
+                      <Eye className="w-3.5 h-3.5 group-hover:text-primary-500 transition-colors duration-200" />
+                      <span className="group-hover:text-neutral-700 transition-colors duration-200">
+                        {listing.views || 0} views
+                      </span>
+                    </span>
                     <span>•</span>
-                    <span>📅 {listing.bookings || 0} bookings</span>
+                    <span className="flex items-center gap-1 group cursor-default">
+                      <Calendar className="w-3.5 h-3.5 group-hover:text-primary-500 transition-colors duration-200" />
+                      <span className="group-hover:text-neutral-700 transition-colors duration-200">
+                        {listing.bookings || 0} bookings
+                      </span>
+                    </span>
                   </div>
                 </div>
               </div>
@@ -428,14 +471,18 @@ export const MyListings = () => {
                   variant="outline"
                   size="sm"
                   onClick={() => handleEdit(listing)}
+                  className="flex items-center gap-1"
                 >
+                  <Pencil className="w-4 h-4" />
                   Edit
                 </Button>
                 <Button
                   variant="danger"
                   size="sm"
                   onClick={() => setShowDeleteModal(listing._id)}
+                  className="flex items-center gap-1"
                 >
+                  <Trash2 className="w-4 h-4" />
                   Delete
                 </Button>
                 <Link to={`/equipment/${listing._id}`} className="ml-auto">
@@ -627,4 +674,5 @@ export const MyListings = () => {
     </div>
   );
 };
+
 export default MyListings;
