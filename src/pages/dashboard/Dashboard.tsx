@@ -166,7 +166,7 @@ export const Dashboard = () => {
             Total Spent
           </p>
           <p className="text-2xl font-bold text-neutral-800 mt-1">
-            {formatCurrency(stats.totalSpent)}
+            {formatCurrency(stats.totalSpent || 0)}
           </p>
         </Card>
       </div>
@@ -213,7 +213,7 @@ export const Dashboard = () => {
                         {formatDate(booking.bookingDateEnd)}
                       </p>
                       <p className="text-sm text-neutral-500">
-                        {formatCurrency(booking.totalPrice)}
+                        {formatCurrency(booking.totalPrice || 0)}
                       </p>
                     </div>
                     <div>{getStatusBadge(booking.status)}</div>

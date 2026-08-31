@@ -7,6 +7,7 @@ import { LoadingSpinner } from "@/components/common/LoadingSpinner";
 import { useToast } from "@/hooks/useToast";
 import { formatRelativeTime } from "@/utils/formatters";
 import type { Notification } from "@/types";
+import { BackButton } from "@/components/shared/BackButton";
 
 export const Notifications = () => {
   const { success, error: toastError } = useToast();
@@ -97,18 +98,9 @@ export const Notifications = () => {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-neutral-800">
-            Notifications
-          </h1>
-          <p className="text-sm text-neutral-500">
-            {unreadCount > 0
-              ? `You have ${unreadCount} unread notification${unreadCount > 1 ? "s" : ""}`
-              : "All caught up! 🎉"}
-          </p>
-        </div>
+      {/* Navigation: Back Button + Header */}
+      <div className="flex items-center justify-between">
+        <BackButton label="Back to Dashboard" fallbackPath="/dashboard" />
         <div className="flex gap-2">
           {unreadCount > 0 && (
             <Button variant="outline" size="sm" onClick={handleMarkAllAsRead}>
@@ -116,6 +108,17 @@ export const Notifications = () => {
             </Button>
           )}
         </div>
+      </div>
+
+      <div>
+        <h1 className="text-2xl md:text-3xl font-bold text-neutral-800">
+          Notifications
+        </h1>
+        <p className="text-sm text-neutral-500">
+          {unreadCount > 0
+            ? `You have ${unreadCount} unread notification${unreadCount > 1 ? "s" : ""}`
+            : "All caught up! 🎉"}
+        </p>
       </div>
 
       {/* Notifications List */}
@@ -140,12 +143,10 @@ export const Notifications = () => {
               `}
             >
               <div className="flex items-start gap-4">
-                {/* Icon */}
                 <div className="w-10 h-10 bg-neutral-100 rounded-full flex items-center justify-center text-xl flex-shrink-0">
                   {getTypeIcon(notification.type)}
                 </div>
 
-                {/* Content */}
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-wrap items-start justify-between gap-2">
                     <div>
@@ -168,7 +169,6 @@ export const Notifications = () => {
                     </div>
                   </div>
 
-                  {/* Actions */}
                   <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-neutral-100">
                     {!notification.isRead && (
                       <Button
@@ -197,4 +197,5 @@ export const Notifications = () => {
     </div>
   );
 };
+
 export default Notifications;
